@@ -41,7 +41,7 @@ test.describe('ApiClient Unit Tests', () => {
     const mockContext = {
       get: async (url: string) => {
         capturedUrl = url;
-        return { status: () => 200 };
+        return { status: () => 200, statusText: () => 'OK', headers: () => ({}), text: async () => '' };
       }
     } as any;
 
@@ -56,7 +56,7 @@ test.describe('ApiClient Unit Tests', () => {
     const mockContext = {
       get: async (url: string) => {
         capturedUrl = url;
-        return { status: () => 200 };
+        return { status: () => 200, statusText: () => 'OK', headers: () => ({}), text: async () => '' };
       }
     } as any;
 
@@ -72,7 +72,7 @@ test.describe('ApiClient Unit Tests', () => {
     const mockContext = {
       post: async (url: string, options: any) => {
         capturedHeaders = options?.headers || {};
-        return { status: () => 201 };
+        return { status: () => 201, statusText: () => 'Created', headers: () => ({}), text: async () => '' };
       }
     } as any;
 
@@ -88,7 +88,7 @@ test.describe('ApiClient Unit Tests', () => {
     const mockContext = {
       get: async (url: string, options: any) => {
         capturedHeaders = options?.headers || {};
-        return { status: () => 200 };
+        return { status: () => 200, statusText: () => 'OK', headers: () => ({}), text: async () => '' };
       }
     } as any;
 
@@ -104,9 +104,9 @@ test.describe('ApiClient Unit Tests', () => {
       get: async () => {
         attempts++;
         if (attempts < 3) {
-          return { status: () => 503 };
+          return { status: () => 503, statusText: () => 'Service Unavailable', headers: () => ({}), text: async () => '' };
         }
-        return { status: () => 200, json: async () => ({ success: true }) };
+        return { status: () => 200, statusText: () => 'OK', headers: () => ({}), text: async () => '{"success":true}', json: async () => ({ success: true }) };
       }
     } as any;
 
@@ -121,7 +121,7 @@ test.describe('ApiClient Unit Tests', () => {
   test('should throw error after exhausting retries on 5xx errors', async () => {
     const mockContext = {
       get: async () => {
-        return { status: () => 500 };
+        return { status: () => 500, statusText: () => 'Internal Server Error', headers: () => ({}), text: async () => '' };
       }
     } as any;
 

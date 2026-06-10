@@ -34,7 +34,7 @@ The framework provides a common base for all enterprise test automation. Project
 
 ```mermaid
 graph TD
-    subgraph Core Package [@hari/playwright-core]
+    subgraph Core
         CLI[Scaffolding CLI]
         Fixtures[Base Fixtures]
         API[Enterprise API Client]
@@ -42,15 +42,15 @@ graph TD
         Cloud[BrowserStack Wrapper]
     end
 
-    subgraph Customer Project Workspace
+    subgraph Workspace
         Tests[Spec Files]
         POM[Page Objects]
-        Config[playwright.config.ts]
+        Config[Playwright Config]
     end
 
-    CLI -. Generates .-> Tests
-    CLI -. Generates .-> POM
-    CLI -. Generates .-> Config
+    CLI --> Tests
+    CLI --> POM
+    CLI --> Config
     
     Tests --> Fixtures
     Tests --> API
