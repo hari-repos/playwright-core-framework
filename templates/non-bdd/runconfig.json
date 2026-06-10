@@ -1,0 +1,15 @@
+{
+  "testEnv": "qa",
+  "timeout": 60000,
+  "expectTimeout": 10000,
+  "actionTimeout": 15000,
+  "navigationTimeout": 30000,
+  "retries": 0,
+  "workers": 1,
+  "reporter": "html",
+  "useBrowserStack": false,
+  "headless": true,
+  "browsers": [
+    "chromium"
+  ]
+}

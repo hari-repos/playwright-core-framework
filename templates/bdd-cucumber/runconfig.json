@@ -1,0 +1,11 @@
+{
+  "testEnv": "qa",
+  "timeout": 60000,
+  "retries": 0,
+  "workers": 1,
+  "useBrowserStack": false,
+  "headless": true,
+  "browsers": [
+    "chromium"
+  ]
+}

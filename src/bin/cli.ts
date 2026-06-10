@@ -47,6 +47,10 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   pkg.devDependencies['@playwright/test'] = '^1.44.1';
   pkg.devDependencies['typescript'] = '^5.4.5';
   pkg.devDependencies['@types/node'] = '^20.12.12';
+  pkg.devDependencies['allure-playwright'] = '^3.9.0';
+  pkg.devDependencies['allure-commandline'] = '^2.29.0';
+  
+  pkg.scripts['report'] = 'allure generate allure-results -o allure-report --clean && allure open allure-report';
 
   if (type === 'bdd') {
     if (runner === 'playwright-bdd') {
@@ -57,6 +61,7 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
       pkg.devDependencies['@cucumber/cucumber'] = '^10.8.0';
       pkg.devDependencies['ts-node'] = '^10.9.2';
       pkg.scripts['test'] = 'cucumber-js';
+      // Cucumber uses a different allure reporter, but we provide it for playwright mostly
     }
   } else {
     pkg.scripts['test'] = 'playwright test';
