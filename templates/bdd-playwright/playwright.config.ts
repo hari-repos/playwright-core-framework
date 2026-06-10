@@ -1,11 +1,6 @@
 import { defineConfig } from '@playwright/test';
-import { defineBddConfig } from 'playwright-bdd';
+import { testDir } from './bdd.config.js';
 import { withRunConfig, withBrowserStack } from '@hari/playwright-core';
-
-const testDir = defineBddConfig({
-  features: 'features/**/*.feature',
-  steps: 'steps/**/*.ts',
-});
 
 // Define static base configuration. Dynamic settings like timeouts, 
 // browser selection, and environment loading are handled by runconfig.json
@@ -27,4 +22,4 @@ const baseConfig = defineConfig({
 
 // withRunConfig reads runconfig.json, loads the correct .env, and merges properties.
 // withBrowserStack applies cloud capabilities if useBrowserStack is true.
-export default withBrowserStack(withRunConfig(baseConfig, __dirname));
+export default withBrowserStack(withRunConfig(baseConfig));

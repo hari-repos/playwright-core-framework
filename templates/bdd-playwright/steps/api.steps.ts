@@ -1,6 +1,6 @@
 import { expect } from '@hari/playwright-core';
-import { Given, Then } from '../bdd.config';
-import { UserApiService } from '../pages/api/UserApiService';
+import { Given, Then } from '../bdd.config.js';
+import { UserApiService } from '../pages/api/UserApiService.js';
 
 let apiResponse: any;
 let userService: UserApiService;
@@ -16,5 +16,5 @@ Then('the response status should be {int}', async ({}, status) => {
 
 Then('the response should contain users', async ({}) => {
   const body = await apiResponse.json();
-  expect(body.data.length).toBeGreaterThan(0);
+  expect(body.length).toBeGreaterThan(0);
 });

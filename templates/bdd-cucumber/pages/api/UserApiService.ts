@@ -1,13 +1,13 @@
-import { APIRequestContext } from '@playwright/test';
+import { ApiClient } from '@hari/playwright-core';
 
 export class UserApiService {
-  readonly apiClient: APIRequestContext;
+  readonly apiClient: ApiClient;
 
-  constructor(apiClient: APIRequestContext) {
+  constructor(apiClient: ApiClient) {
     this.apiClient = apiClient;
   }
 
   async getUsers(page: number = 2) {
-    return await this.apiClient.get(`https://reqres.in/api/users?page=${page}`);
+    return await this.apiClient.get(`https://jsonplaceholder.typicode.com/users`);
   }
 }

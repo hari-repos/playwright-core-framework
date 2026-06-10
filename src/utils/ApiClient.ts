@@ -98,8 +98,11 @@ export class ApiClient {
     options?: Parameters<APIRequestContext['get']>[1], 
     retries = 3
   ): Promise<ApiClientResponse> {
-    const url = this.baseURL ? `${this.baseURL}${endpoint}` : endpoint;
-    const token = process.env.BEARER_TOKEN;
+    const isAbsoluteUrl = /^https?:\/\//i.test(endpoint);
+    const url = (this.baseURL && !isAbsoluteUrl)
+      ? `${this.baseURL.replace(/\/$/, '')}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`
+      : endpoint;
+    const token = !isAbsoluteUrl ? process.env.BEARER_TOKEN : undefined;
 
     const reqOptions = {
       ...options,

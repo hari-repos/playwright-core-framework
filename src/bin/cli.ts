@@ -46,6 +46,7 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   let pkg: any = {
     name: projectName,
     version: '1.0.0',
+    type: 'module',
     scripts: {},
     devDependencies: {}
   };
@@ -53,6 +54,8 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   if (fs.existsSync(pkgPath)) {
     pkg = await fs.readJson(pkgPath);
   }
+  
+  pkg.type = 'module';
 
   pkg.devDependencies = pkg.devDependencies || {};
   pkg.scripts = pkg.scripts || {};
@@ -73,13 +76,14 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
 
   if (type === 'bdd') {
     if (runner === 'playwright-bdd') {
-      pkg.devDependencies['playwright-bdd'] = '^7.1.2';
+      pkg.devDependencies['playwright'] = '^1.44.1';
+      pkg.devDependencies['playwright-bdd'] = '^9.0.0';
       pkg.scripts['bddgen'] = 'bddgen';
-      pkg.scripts['test'] = 'bddgen && playwright test';
+      pkg.scripts['test'] = 'npm run bddgen && playwright test';
     } else if (runner === 'cucumber') {
       pkg.devDependencies['@cucumber/cucumber'] = '^10.8.0';
-      pkg.devDependencies['ts-node'] = '^10.9.2';
-      pkg.scripts['test'] = 'cucumber-js';
+      pkg.devDependencies['tsx'] = '^4.11.0';
+      pkg.scripts['test'] = 'NODE_OPTIONS="--import tsx" cucumber-js';
       // Cucumber uses a different allure reporter, but we provide it for playwright mostly
     }
   } else {

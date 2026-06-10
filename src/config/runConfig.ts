@@ -3,7 +3,7 @@ import { devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
-import { getReportDirectory } from './reports';
+import { getReportDirectory } from './reports.js';
 
 /**
  * Interface defining the options that can be provided in `runconfig.json`

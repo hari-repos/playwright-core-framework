@@ -1,9 +1,13 @@
 import { Given, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
-import { CustomWorld } from '../support/setup';
-import { HomePage } from '../pages/digital/HomePage';
+import { getTestData } from '@hari/playwright-core';
+import { CustomWorld } from '../support/setup.js';
+import { HomePage } from '../pages/digital/HomePage.js';
 
 Given('I am on the Playwright homepage', async function (this: CustomWorld) {
+  const data = getTestData<{ searchQuery: string }>();
+  console.log(`Using test data for search: ${data.searchQuery}`);
+
   const homePage = new HomePage(this.page!);
   await homePage.goto();
 });

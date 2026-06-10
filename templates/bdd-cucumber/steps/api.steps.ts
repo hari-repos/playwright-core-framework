@@ -1,7 +1,7 @@
 import { Given, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
-import { CustomWorld } from '../support/setup';
-import { UserApiService } from '../pages/api/UserApiService';
+import { CustomWorld } from '../support/setup.js';
+import { UserApiService } from '../pages/api/UserApiService.js';
 
 Given('I fetch users from page {int}', async function (this: CustomWorld, pageNum: number) {
   const userService = new UserApiService(this.apiClient!);
@@ -14,5 +14,5 @@ Then('the response status should be {int}', async function (this: CustomWorld, s
 
 Then('the response should contain users', async function (this: CustomWorld) {
   const body = await this.apiResponse!.json();
-  expect(body.data.length).toBeGreaterThan(0);
+  expect(body.length).toBeGreaterThan(0);
 });

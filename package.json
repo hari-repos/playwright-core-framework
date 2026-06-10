@@ -10,7 +10,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "playwright test",
+    "test:unit": "playwright test tests/unit",
+    "test:templates": "playwright test tests/templates"
   },
   "files": [
     "dist",

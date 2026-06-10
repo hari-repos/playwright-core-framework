@@ -21,4 +21,4 @@ const baseConfig = defineConfig({
 
 // withRunConfig reads runconfig.json, loads the correct .env, and merges properties.
 // withBrowserStack applies cloud capabilities if useBrowserStack is true.
-export default withBrowserStack(withRunConfig(baseConfig, __dirname));
+export default withBrowserStack(withRunConfig(baseConfig));
