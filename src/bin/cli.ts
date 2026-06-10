@@ -1,0 +1,143 @@
+#!/usr/bin/env node
+
+import * as fs from 'fs-extra';
+import * as path from 'path';
+
+function parseArgs() {
+  const args = process.argv.slice(2);
+  let type = 'bdd';
+  let runner = 'playwright-bdd';
+  let isInit = false;
+  let projectName = 'playwright-tests';
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === 'init') {
+      isInit = true;
+    } else if (args[i] === '--type' && args[i + 1]) {
+      type = args[i + 1];
+      i++;
+    } else if (args[i] === '--runner' && args[i + 1]) {
+      runner = args[i + 1];
+      i++;
+    } else if (args[i] === '--name' && args[i + 1]) {
+      projectName = args[i + 1];
+      i++;
+    }
+  }
+
+  return { isInit, type, runner, projectName };
+}
+
+async function updatePackageJson(targetDir: string, type: string, runner: string, projectName: string) {
+  const pkgPath = path.join(targetDir, 'package.json');
+  let pkg: any = {
+    name: projectName,
+    version: '1.0.0',
+    scripts: {},
+    devDependencies: {}
+  };
+
+  if (fs.existsSync(pkgPath)) {
+    pkg = await fs.readJson(pkgPath);
+  }
+
+  pkg.devDependencies = pkg.devDependencies || {};
+  pkg.scripts = pkg.scripts || {};
+
+  pkg.devDependencies['@playwright/test'] = '^1.44.1';
+  pkg.devDependencies['typescript'] = '^5.4.5';
+  pkg.devDependencies['@types/node'] = '^20.12.12';
+
+  if (type === 'bdd') {
+    if (runner === 'playwright-bdd') {
+      pkg.devDependencies['playwright-bdd'] = '^7.1.2';
+      pkg.scripts['bddgen'] = 'bddgen';
+      pkg.scripts['test'] = 'bddgen && playwright test';
+    } else if (runner === 'cucumber') {
+      pkg.devDependencies['@cucumber/cucumber'] = '^10.8.0';
+      pkg.devDependencies['ts-node'] = '^10.9.2';
+      pkg.scripts['test'] = 'cucumber-js';
+    }
+  } else {
+    pkg.scripts['test'] = 'playwright test';
+  }
+
+  await fs.writeJson(pkgPath, pkg, { spaces: 2 });
+  console.log(`📦 Updated package.json with necessary dependencies and scripts.`);
+}
+
+async function init() {
+  const { isInit, type, runner, projectName } = parseArgs();
+
+  if (!isInit) {
+    console.log(`Usage: npx @hari/playwright-core init [--name <projectName>] [--type bdd|non-bdd] [--runner playwright-bdd|cucumber]`);
+    process.exit(1);
+  }
+
+  let templateSubDir = 'non-bdd';
+  if (type === 'bdd') {
+    templateSubDir = runner === 'cucumber' ? 'bdd-cucumber' : 'bdd-playwright';
+  }
+
+  const targetDir = process.cwd();
+  const templatesDir = path.join(__dirname, '..', '..', 'templates', templateSubDir);
+
+  console.log(`🚀 Initializing new @hari/playwright-core project (${templateSubDir}) in ${targetDir}...`);
+
+  try {
+    if (!fs.existsSync(templatesDir)) {
+      console.error(`❌ Error: Templates directory not found at ${templatesDir}`);
+      process.exit(1);
+    }
+
+    console.log(`📂 Copying framework templates...`);
+    await fs.copy(templatesDir, targetDir, {
+      filter: (src) => {
+        return true;
+      }
+    });
+
+    const replaceProjectNameInFiles = async (dir: string) => {
+      const files = await fs.readdir(dir);
+      for (const file of files) {
+        const filePath = path.join(dir, file);
+        const stat = await fs.stat(filePath);
+        if (stat.isDirectory()) {
+          if (file !== 'node_modules' && file !== '.git') {
+            await replaceProjectNameInFiles(filePath);
+          }
+        } else if (stat.isFile()) {
+          try {
+            let content = await fs.readFile(filePath, 'utf-8');
+            if (content.includes('{{PROJECT_NAME}}')) {
+              content = content.replace(/\{\{PROJECT_NAME\}\}/g, projectName);
+              await fs.writeFile(filePath, content, 'utf-8');
+            }
+          } catch (e) {
+            // Ignore errors for binary files
+          }
+        }
+      }
+    };
+    await replaceProjectNameInFiles(targetDir);
+
+    await updatePackageJson(targetDir, type, runner, projectName);
+
+    console.log(`✅ Project successfully scaffolded!`);
+    console.log(`\nNext Steps:`);
+    console.log(`1. Run 'npm install' to install the injected dependencies.`);
+    console.log(`2. Copy '.env.example' to '.env' and update your configuration.`);
+    if (type === 'bdd' && runner === 'playwright-bdd') {
+      console.log(`3. Run 'npm run test' which will execute bddgen and Playwright.\n`);
+    } else if (type === 'bdd' && runner === 'cucumber') {
+      console.log(`3. Run 'npm run test' to execute cucumber-js.\n`);
+    } else {
+      console.log(`3. Run 'npm run test' to execute your baseline tests.\n`);
+    }
+  } catch (error) {
+    console.error(`❌ Failed to initialize project:`, error);
+    process.exit(1);
+  }
+}
+
+init();

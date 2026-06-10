@@ -1,0 +1,39 @@
+{
+  "name": "@hari/playwright-core",
+  "version": "1.0.0",
+  "description": "Enterprise-grade Playwright platform framework",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "hari-playwright-init": "dist/bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "playwright",
+    "testing",
+    "framework"
+  ],
+  "author": "hari",
+  "license": "ISC"
+}
