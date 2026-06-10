@@ -7,7 +7,16 @@ import { getReportDirectory } from './reports.js';
 
 /**
  * Interface defining the options that can be provided in `runconfig.json`
- * to override default Playwright configurations.
+ * to override default Playwright configurations without modifying the code.
+ * 
+ * @example
+ * ```json
+ * {
+ *   "testEnv": "STAGING",
+ *   "headless": false,
+ *   "retries": 2
+ * }
+ * ```
  */
 export interface RunConfig {
   /** The target test environment (e.g., 'QA', 'DEV'). */
@@ -35,12 +44,22 @@ export interface RunConfig {
 }
 
 /**
- * Opt-in utility to wrap a Playwright configuration with values from runconfig.json.
- * It will also automatically load the correct .env file based on the testEnv defined.
+ * Opt-in utility to wrap a Playwright configuration with values from `runconfig.json`.
+ * It will also automatically load the correct `.env` file based on the `testEnv` defined.
  *
- * @param baseConfig The base Playwright configuration
- * @param configDir The directory where runconfig.json and .env files are located (usually process.cwd())
- * @returns The modified Playwright configuration
+ * @param baseConfig The base Playwright configuration defined in your project
+ * @param configDir The directory where `runconfig.json` and `.env` files are located (usually `process.cwd()`)
+ * @returns The final, modified Playwright configuration ready for execution
+ * 
+ * @example
+ * ```typescript
+ * import { defineConfig } from '@playwright/test';
+ * import { withRunConfig } from '@hari/playwright-core';
+ * 
+ * export default withRunConfig(defineConfig({
+ *   testDir: './tests',
+ * }));
+ * ```
  */
 export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: string = process.cwd()): PlaywrightTestConfig {
   const runConfigPath = path.resolve(configDir, 'runconfig.json');
@@ -84,30 +103,12 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
   if (runConfig.reporter !== undefined) {
     if (runConfig.reporter.toLowerCase() === 'allure') {
       finalConfig.reporter = [
-        ['html', { outputFolder: `${runDir}/html-report` }], 
-        ['allure-playwright', { outputFolder: `${runDir}/allure-results` }]
+        ['html', { outputFolder: `${runDir}/html` }], 
+        ['allure-playwright', { resultsDir: `${runDir}/allure-results` }]
       ];
     } else {
       finalConfig.reporter = runConfig.reporter;
     }
-  } else if (Array.isArray(finalConfig.reporter)) {
-    // Override template reporters dynamically
-    finalConfig.reporter = finalConfig.reporter.map((r: any) => {
-      if (Array.isArray(r)) {
-        const [name, opts] = r;
-        if (name === 'html') return [name, { ...opts, outputFolder: `${runDir}/html-report` }];
-        if (name === 'allure-playwright') return [name, { ...opts, outputFolder: `${runDir}/allure-results` }];
-        return r;
-      } else {
-        if (r === 'html') return [r, { outputFolder: `${runDir}/html-report` }];
-        if (r === 'allure-playwright') return [r, { outputFolder: `${runDir}/allure-results` }];
-        return r;
-      }
-    });
-  } else if (!finalConfig.reporter) {
-    finalConfig.reporter = [
-      ['html', { outputFolder: `${runDir}/html-report` }]
-    ];
   }
 
   // Expect Configuration
@@ -147,6 +148,26 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
         }
       };
     });
+  }
+
+  // 4. Generate Allure Environment Properties
+  try {
+    const allureResultsDir = path.resolve(configDir, runDir, 'allure-results');
+    if (!fs.existsSync(allureResultsDir)) {
+      fs.mkdirSync(allureResultsDir, { recursive: true });
+    }
+    const envProps = [
+      `Test_Environment=${testEnv.toUpperCase()}`,
+      `OS=${process.platform}`,
+      `Node_Version=${process.version}`,
+      `Headless=${finalConfig.use?.headless ?? true}`,
+      `Retries=${finalConfig.retries ?? 0}`,
+      `Workers=${finalConfig.workers ?? 1}`,
+      `BrowserStack=${process.env.USE_BROWSERSTACK === 'true'}`
+    ].join('\n');
+    fs.writeFileSync(path.join(allureResultsDir, 'environment.properties'), envProps);
+  } catch (err) {
+    console.warn(`⚠️ Failed to generate Allure environment.properties:`, err);
   }
 
   return finalConfig;

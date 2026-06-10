@@ -9,7 +9,8 @@ dotenv.config();
 export type TestEnvironment = string;
 
 /**
- * Interface defining the environment configuration variables available during runtime.
+ * Interface defining the globally available environment configuration variables.
+ * These are securely parsed from your `.env` files based on the active `TEST_ENV`.
  */
 export interface EnvConfig {
   /**
@@ -23,7 +24,8 @@ export interface EnvConfig {
   baseURL: string;
   
   /**
-   * The base URL for API tests (derived from process.env.API_URL).
+   * The base URL for API tests.
+   * Derived from `process.env.API_URL`.
    */
   apiUrl: string;
 }

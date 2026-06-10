@@ -1,15 +1,18 @@
 import { defineConfig } from '@playwright/test';
-import { withRunConfig, withBrowserStack } from '@hari/playwright-core';
+import { withRunConfig, withBrowserStack, getReportDirectory } from '@hari/playwright-core';
+
+const reportDir = getReportDirectory();
 
 // Define static base configuration. Dynamic settings like timeouts, 
 // browser selection, and environment loading are handled by runconfig.json
 const baseConfig = defineConfig({
   testDir: './tests',
+  outputDir: `${reportDir}/test-results`,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   reporter: [
-    ['html'],
-    ['allure-playwright']
+    ['html', { outputFolder: `${reportDir}/html`, open: 'never' }],
+    ['allure-playwright', { resultsDir: `${reportDir}/allure-results` }]
   ],
   use: {
     trace: 'on-first-retry',

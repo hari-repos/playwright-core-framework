@@ -63,16 +63,17 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   pkg.devDependencies['@playwright/test'] = '^1.44.1';
   pkg.devDependencies['typescript'] = '^5.4.5';
   pkg.devDependencies['@types/node'] = '^20.12.12';
-  pkg.devDependencies['allure-commandline'] = '^2.29.0';
+  pkg.devDependencies['allure'] = '^3.10.0';
+  pkg.devDependencies['@allurereport/plugin-awesome'] = '^3.10.0';
   pkg.devDependencies['@hari/playwright-core'] = '^1.0.0';
 
   if (type === 'bdd' && runner === 'cucumber') {
     pkg.devDependencies['allure-cucumberjs'] = '^3.0.0-beta.5';
   } else {
-    pkg.devDependencies['allure-playwright'] = '^3.9.0';
+    pkg.devDependencies['allure-playwright'] = '^3.10.0';
   }
-  
-  pkg.scripts['report'] = 'hari-serve-report';
+  pkg.scripts['report:open'] = 'hari-serve-report';
+  pkg.scripts['report:download'] = 'hari-serve-report --single-file';
 
   if (type === 'bdd') {
     if (runner === 'playwright-bdd') {

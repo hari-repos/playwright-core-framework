@@ -6,7 +6,6 @@
   "navigationTimeout": 30000,
   "retries": 0,
   "workers": 1,
-  "reporter": "html",
   "useBrowserStack": false,
   "headless": true,
   "browsers": [

@@ -14,7 +14,7 @@
 
 ---
 
-> **`@hari/playwright-core`** is a centralized, modular test automation framework built on top of [Playwright](https://playwright.dev/). It provides enterprise-grade abstractions, reusable base fixtures, an intuitive API client, and a powerful CLI tool to scaffold new testing projects consistently across your organization.
+> **`@hari/playwright-core`** is a centralized, modular test automation framework built on top of [Playwright](https://playwright.dev/). It provides enterprise-grade abstractions, reusable base fixtures, an intuitive API client, and a powerful CLI tool to consistently scaffold new testing projects.
 
 ## ✨ Framework Features
 
@@ -74,7 +74,7 @@ npm install @hari/playwright-core
 
 ## 🛠️ Creating a New Project (Scaffolding)
 
-The absolute fastest way to get your project team up and running is to use the `init` command. The CLI creates a complete directory structure, adds configuration files, and drops in sample POM tests customized to your project name.
+Use the `init` command to scaffold a complete directory structure, configuration files, and sample POM tests customized to your project name.
 
 ### Step 1: Initialize
 
@@ -131,7 +131,7 @@ import {
 ```
 
 ### 1. Enterprise `test` Fixture
-We provide an extended `test` fixture that automatically injects `envConfig` and an initialized `apiClient`.
+We provide an extended `test` fixture that automatically injects `envConfig` and an initialized `apiClient` with proper typings for IntelliSense.
 
 ```typescript
 import { test, expect } from '@hari/playwright-core';
@@ -146,7 +146,7 @@ test('verify user profile API', async ({ apiClient, envConfig }) => {
 ```
 
 ### 2. Environment Configuration (`envConfig`)
-A strongly-typed configuration module that parses your `.env` files and securely exposes environment variables (URLs, credentials).
+A strongly-typed configuration module that parses your `.env` files and securely exposes environment variables (URLs, credentials). Use this to eliminate hardcoded values and improve IntelliSense autocompletion for environment tokens.
 
 ### 3. Smart Test Runner Wrapper (`withRunConfig`)
 Override Playwright defaults dynamically using `runconfig.json`.
@@ -173,15 +173,26 @@ USE_BROWSERSTACK=true BROWSERSTACK_USERNAME=myUser BROWSERSTACK_ACCESS_KEY=key n
 
 ---
 
-## 📊 Reporting
+## 📊 Enterprise Allure Reporting
 
-The framework is natively integrated with **Allure Reporting**. When you scaffold a new project, reporting is already configured!
+The framework is natively integrated with **Allure Reporting**, completely rewritten using the latest Allure 3 Node.js CLI (meaning **Zero Java Dependency**).
 
-To view your beautiful test reports:
+### Zero-Config Core Features
+When you scaffold a new project, reporting is fully configured out-of-the-box:
+- **Environment Widget Auto-Generation**: The core automatically detects your OS, Node version, Playwright workers, and `testEnv`, and builds the `environment.properties` file for the dashboard widget!
+- **Automatic API Logging**: The `ApiClient` seamlessly intercepts every request and response, parses the payloads, and attaches them as formatted JSON to your Allure report automatically.
+- **Visual Diagnostics**: Trace files, videos, and screenshots are configured to automatically attach to the report on failure.
+
+### Generating & Viewing Reports
+The core scaffolding generates NPM scripts allowing you to serve a web dashboard or generate a standalone file for sharing via Slack/Email:
+
 ```bash
-npm run report
+# Serve the dashboard locally
+npm run report:open
+
+# Generate a single standalone index.html file
+npm run report:download
 ```
-This command serves the generated Allure results in an interactive web dashboard.
 
 ---
 

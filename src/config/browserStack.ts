@@ -3,11 +3,21 @@ import type { PlaywrightTestConfig } from '@playwright/test';
 /**
  * Opt-in utility to wrap a Playwright configuration with BrowserStack capabilities.
  * 
- * If BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY are not present in the environment,
+ * If `BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` are not present in the environment,
  * it will return the base configuration unchanged, allowing for seamless local execution.
  * 
- * @param baseConfig The base Playwright configuration
- * @returns The modified Playwright configuration with BrowserStack connection options
+ * @param baseConfig The base Playwright configuration to wrap
+ * @returns The modified Playwright configuration with BrowserStack connection options injected
+ * 
+ * @example
+ * ```typescript
+ * import { defineConfig } from '@playwright/test';
+ * import { withBrowserStack } from '@hari/playwright-core';
+ * 
+ * export default withBrowserStack(defineConfig({
+ *   testDir: './tests',
+ * }));
+ * ```
  */
 export function withBrowserStack(baseConfig: PlaywrightTestConfig): PlaywrightTestConfig {
   // Explicitly require USE_BROWSERSTACK=true to connect, allowing easy local toggling.

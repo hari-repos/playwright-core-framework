@@ -3,21 +3,36 @@ import { ApiClient } from '../utils/ApiClient.js';
 import { envConfig, EnvConfig } from '../config/envConfig.js';
 
 /**
- * Defines the custom fixtures available in tests.
+ * Defines the custom enterprise fixtures available to all Playwright tests.
+ * These fixtures are automatically injected into tests when using the extended `test` object.
+ * 
+ * @example
+ * ```typescript
+ * test('my test', async ({ envConfig, apiClient }) => {
+ *   console.log(envConfig.apiUrl);
+ *   await apiClient.get('/users');
+ * });
+ * ```
  */
 export interface CustomFixtures {
   /**
-   * The resolved environment configuration containing base URLs and API endpoints.
+   * The resolved environment configuration.
+   * Contains properties like `env` (e.g. 'QA', 'PROD'), `baseURL`, and `apiUrl`.
+   * Automatically loaded from your project's `.env.{TEST_ENV}` and `.env` files.
    */
   envConfig: EnvConfig;
   
   /**
-   * The initialized enterprise API client for making HTTP requests.
+   * An initialized enterprise API client wrapper for making HTTP requests.
+   * Built on top of Playwright's `request` context, it provides automatic
+   * authentication injection, logging, and retry mechanisms.
    */
   apiClient: ApiClient;
 
-  /**
-   * Internal automatic fixture for standardized logging.
+/**
+   * Internal fixture for standardized test lifecycle logging.
+   * Runs automatically for every test to log start and failure events.
+   * @internal
    */
   _autoLogging: void;
 }
@@ -30,8 +45,9 @@ type CoreFixturesType = Fixtures<
 >;
 
 /**
- * Reusable fixture definitions that can be applied to any Playwright test runner.
- * This is particularly useful for playwright-bdd which requires extending its own test instance.
+ * Reusable base fixture definitions.
+ * Provides the implementation for `envConfig`, `apiClient`, and internal auto-logging.
+ * Can be used to extend custom test runners or integrate with `playwright-bdd`.
  */
 export const coreFixtures: CoreFixturesType = {
   envConfig: async ({}, use) => {
@@ -59,8 +75,19 @@ export const coreFixtures: CoreFixturesType = {
 };
 
 /**
- * The extended Playwright test object providing enterprise fixtures (`envConfig`, `apiClient`).
- * Use this in your spec files instead of the default `@playwright/test`.
+ * The extended Playwright `test` object.
+ * This should be used in place of the default `@playwright/test` import in your spec files.
+ * It provides built-in access to enterprise fixtures like `envConfig` and `apiClient`.
+ * 
+ * @example
+ * ```typescript
+ * import { test, expect } from '@hari/playwright-core';
+ * 
+ * test('Check API', async ({ apiClient }) => {
+ *   const response = await apiClient.get('/health');
+ *   expect(response.status()).toBe(200);
+ * });
+ * ```
  */
 export const test = baseTest.extend<CustomFixtures>(coreFixtures);
 
