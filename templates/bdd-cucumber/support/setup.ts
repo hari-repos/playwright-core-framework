@@ -1,4 +1,4 @@
-import { setWorldConstructor, World, BeforeAll, AfterAll, Before, After, setDefaultTimeout } from '@cucumber/cucumber';
+import { setWorldConstructor, World, BeforeAll, AfterAll, Before, After, setDefaultTimeout, Status } from '@cucumber/cucumber';
 import { chromium, Browser, Page, BrowserContext, request, APIRequestContext, APIResponse } from '@playwright/test';
 
 setDefaultTimeout(60 * 1000);
@@ -36,7 +36,14 @@ Before(async function (this: CustomWorld) {
   this.apiClient = await request.newContext();
 });
 
-After(async function (this: CustomWorld) {
+After(async function (this: CustomWorld, scenario) {
+  if (scenario.result?.status === Status.FAILED) {
+    if (this.page) {
+      const screenshot = await this.page.screenshot({ fullPage: true });
+      this.attach(screenshot, 'image/png');
+    }
+  }
+
   await this.page?.close();
   await this.apiClient?.dispose();
   await this.context?.close();

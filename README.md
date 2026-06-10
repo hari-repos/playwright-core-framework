@@ -1,27 +1,64 @@
 <div align="center">
   <img src="https://playwright.dev/img/playwright-logo.svg" width="120" alt="Playwright Logo" />
   <h1>@hari/playwright-core</h1>
-  <p><strong>Enterprise-grade Playwright Platform Framework</strong></p>
+  <p>
+    <strong>Enterprise-grade Playwright Platform Framework</strong>
+  </p>
+  <p>
+    <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
+    <img alt="Playwright" src="https://img.shields.io/badge/playwright-^1.44.1-green.svg" />
+    <img alt="TypeScript" src="https://img.shields.io/badge/typescript-^5.4.5-blue.svg" />
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+  </p>
 </div>
-
-<p align="center">
-  <a href="#-features">Features</a> •
-  <a href="#-installation">Installation</a> •
-  <a href="#-scaffolding-a-new-project">Scaffolding</a> •
-  <a href="#-core-modules">Core Modules</a>
-</p>
 
 ---
 
-`@hari/playwright-core` is a centralized, modular test automation framework built on top of [Playwright](https://playwright.dev/). It provides enterprise-grade abstractions, reusable base fixtures, an intuitive API client, and a powerful CLI tool to scaffold new testing projects consistently across your organization.
+> **`@hari/playwright-core`** is a centralized, modular test automation framework built on top of [Playwright](https://playwright.dev/). It provides enterprise-grade abstractions, reusable base fixtures, an intuitive API client, and a powerful CLI tool to scaffold new testing projects consistently across your organization.
 
-## 🚀 Features
+## ✨ Framework Features
 
-- **Project Scaffolding**: Instantly generate complete, standardized testing projects using our built-in CLI.
-- **Multiple Test Runners**: Support for native Playwright, `playwright-bdd`, and `@cucumber/cucumber`.
-- **Page Object Model (POM)**: Scaffolded templates follow strict, maintainable POM patterns for both UI and API tests.
-- **Centralized Core Utilities**: Reusable API clients and environment configurations exported right out of the box.
-- **Dynamic Template Injection**: Automatically customize scaffolded files with your target project name.
+| Feature | Description |
+| --- | --- |
+| 🚀 **Instant Scaffolding** | Generate complete, standardized testing projects using our built-in CLI within seconds. |
+| 🔄 **Multi-Runner Support** | Seamlessly switch between Native Playwright, `playwright-bdd`, and `@cucumber/cucumber`. |
+| 🏗️ **Strict POM Patterns** | Scaffolded templates enforce strict Page Object Model (POM) patterns for both UI and API tests. |
+| 🌐 **Core Utility Exports** | Reusable API clients, dynamic environment configs, and pre-built base fixtures right out of the box. |
+| ☁️ **Cloud Execution** | Natively wraps your config for zero-friction scaling to BrowserStack. |
+
+---
+
+## 🏛️ Architecture Overview
+
+The framework provides a common base for all enterprise test automation. Project teams use the CLI to generate a standardized workspace, which inherits utilities from the core package.
+
+```mermaid
+graph TD
+    subgraph Core Package [@hari/playwright-core]
+        CLI[Scaffolding CLI]
+        Fixtures[Base Fixtures]
+        API[Enterprise API Client]
+        Env[Environment Configs]
+        Cloud[BrowserStack Wrapper]
+    end
+
+    subgraph Customer Project Workspace
+        Tests[Spec Files]
+        POM[Page Objects]
+        Config[playwright.config.ts]
+    end
+
+    CLI -. Generates .-> Tests
+    CLI -. Generates .-> POM
+    CLI -. Generates .-> Config
+    
+    Tests --> Fixtures
+    Tests --> API
+    Config --> Cloud
+    Config --> Env
+```
+
+---
 
 ## 📦 Installation
 
@@ -33,98 +70,121 @@ npm install @hari/playwright-core
 
 *(Ensure you have its peer dependencies `@playwright/test` and `typescript` installed).*
 
-## 🏗️ Scaffolding a New Project
+---
 
-The quickest way to start a new test automation project with enterprise standards is to use the `init` command. This CLI command scaffolds a complete directory structure, configuration files, and sample POM tests.
+## 🛠️ Creating a New Project (Scaffolding)
 
-### Basic Usage
+The absolute fastest way to get your project team up and running is to use the `init` command. The CLI creates a complete directory structure, adds configuration files, and drops in sample POM tests customized to your project name.
+
+### Step 1: Initialize
 
 Run the CLI via `npx` in an empty directory:
 
 ```bash
-npx @hari/playwright-core init --name my-awesome-tests
+npx @hari/playwright-core init --name <your-project-name>
 ```
 
-### CLI Options
+### Step 2: Choose Your Template
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--name` | `playwright-tests` | Name of your project (injected into `package.json` and templates). |
-| `--type` | `bdd` | The testing style. Choices: `bdd` or `non-bdd`. |
-| `--runner` | `playwright-bdd` | (If `type=bdd`) The test runner to use. Choices: `playwright-bdd` or `cucumber`. |
+Our CLI supports dynamic template injection based on your preferred testing paradigm. 
 
-### Examples
-
-**1. Native Playwright (Non-BDD)**
+#### Option A: Native Playwright (Non-BDD)
+Standard Playwright spec files (`.spec.ts`).
 ```bash
 npx @hari/playwright-core init --name ui-regression --type non-bdd
 ```
 
-**2. Playwright BDD**
+#### Option B: Playwright BDD (Recommended for BDD)
+Uses `playwright-bdd` which natively compiles Gherkin to Playwright specs.
 ```bash
 npx @hari/playwright-core init --name bdd-e2e --type bdd --runner playwright-bdd
 ```
 
-**3. Cucumber BDD**
+#### Option C: Cucumber BDD
+Uses traditional `@cucumber/cucumber` integration.
 ```bash
 npx @hari/playwright-core init --name cucumber-e2e --type bdd --runner cucumber
 ```
 
-After scaffolding, follow the printed instructions:
-1. Run `npm install`
-2. Copy `.env.example` to `.env`
-3. Run `npm run test`
+### Step 3: Install & Run
 
-## 🛠️ Core Modules
+After scaffolding, the CLI handles the heavy lifting. All you need to do is:
+1. **Install dependencies**: `npm install`
+2. **Setup config**: `cp .env.example .env`
+3. **Execute tests**: `npm run test`
 
-If you are extending the framework or building tests manually, you can import core utilities directly from the package:
+---
+
+## 🧠 Core Modules Guide
+
+If you are extending the framework or building tests manually, import core utilities directly:
 
 ```typescript
 import { 
-  baseFixtures, 
+  test,
+  expect,
   ApiClient, 
-  envConfig 
+  envConfig,
+  withBrowserStack,
+  withRunConfig
 } from '@hari/playwright-core';
 ```
 
-### 1. `baseFixtures`
-Extended Playwright test fixtures providing custom setups, reporting hooks, or specialized logging to keep your spec files clean.
+### 1. Enterprise `test` Fixture
+We provide an extended `test` fixture that automatically injects `envConfig` and an initialized `apiClient`.
 
-### 2. `ApiClient`
-A wrapper around Playwright's `APIRequestContext` that simplifies API testing. It handles token injection, standardized logging, and common REST operations.
+```typescript
+import { test, expect } from '@hari/playwright-core';
 
-### 3. `envConfig`
-A strongly-typed configuration module that parses your `.env` files and exposes your environment variables (like URLs, credentials, and toggles) securely.
+test('verify user profile API', async ({ apiClient, envConfig }) => {
+  const response = await apiClient.get('/api/v1/profile');
+  expect(response.status()).toBe(200);
+  
+  const data = await response.json();
+  console.log(`Running in environment: ${envConfig.env}`);
+});
+```
 
-### 4. `withBrowserStack`
-An opt-in configuration wrapper that connects your Playwright tests to BrowserStack for cloud execution. 
+### 2. Environment Configuration (`envConfig`)
+A strongly-typed configuration module that parses your `.env` files and securely exposes environment variables (URLs, credentials).
 
-To use it, wrap your base configuration in `playwright.config.ts`:
+### 3. Smart Test Runner Wrapper (`withRunConfig`)
+Override Playwright defaults dynamically using `runconfig.json`.
 
 ```typescript
 import { defineConfig } from '@playwright/test';
-import { withBrowserStack } from '@hari/playwright-core';
+import { withRunConfig } from '@hari/playwright-core';
 
 const baseConfig = defineConfig({
   testDir: './tests',
-  projects: [
-    { name: 'Chrome', use: { browserName: 'chromium' } },
-  ],
 });
 
-export default withBrowserStack(baseConfig);
+// Auto-loads runconfig.json and .env
+export default withRunConfig(baseConfig, __dirname);
 ```
 
-To execute tests on BrowserStack, run your tests with the `USE_BROWSERSTACK=true` environment variable and provide your credentials:
+### 4. Cloud Execution (`withBrowserStack`)
+Opt-in BrowserStack wrapper that injects capabilities effortlessly.
 
 ```bash
-USE_BROWSERSTACK=true BROWSERSTACK_USERNAME=myUser BROWSERSTACK_ACCESS_KEY=myKey npm test
+# Run tests on BrowserStack without changing code
+USE_BROWSERSTACK=true BROWSERSTACK_USERNAME=myUser BROWSERSTACK_ACCESS_KEY=key npm test
 ```
 
-If `USE_BROWSERSTACK` is missing or set to `false`, it gracefully falls back to local execution.
-Additionally, any Playwright project with `"api"` in its name (e.g., `name: 'API Tests'`) is automatically excluded from BrowserStack execution, keeping API tests fast and local.
+---
+
+## 📊 Reporting
+
+The framework is natively integrated with **Allure Reporting**. When you scaffold a new project, reporting is already configured!
+
+To view your beautiful test reports:
+```bash
+npm run report
+```
+This command serves the generated Allure results in an interactive web dashboard.
 
 ---
+
 <div align="center">
   <i>Built for scale. Maintained with ❤️ by hari.</i>
 </div>

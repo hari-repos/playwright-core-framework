@@ -1,8 +1,6 @@
-import { createBdd } from 'playwright-bdd';
-import { test, expect } from '@hari/playwright-core';
+import { expect } from '@hari/playwright-core';
+import { Given, Then } from '../bdd.config';
 import { HomePage } from '../pages/digital/HomePage';
-
-const { Given, Then } = createBdd(test);
 
 Given('I am on the Playwright homepage', async ({ page }) => {
   const homePage = new HomePage(page);

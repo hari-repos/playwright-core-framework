@@ -1,8 +1,6 @@
-import { createBdd } from 'playwright-bdd';
-import { test, expect } from '@hari/playwright-core';
+import { expect } from '@hari/playwright-core';
+import { Given, Then } from '../bdd.config';
 import { UserApiService } from '../pages/api/UserApiService';
-
-const { Given, Then } = createBdd(test);
 
 let apiResponse: any;
 let userService: UserApiService;

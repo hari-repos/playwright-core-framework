@@ -3,6 +3,10 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
+/**
+ * Parses command line arguments to determine initialization options.
+ * @returns Object containing scaffolding preferences (type, runner, project name, etc.).
+ */
 function parseArgs() {
   const args = process.argv.slice(2);
   let type = 'bdd';
@@ -28,6 +32,15 @@ function parseArgs() {
   return { isInit, type, runner, projectName };
 }
 
+/**
+ * Scaffolds and updates the target directory's package.json file.
+ * Injects necessary testing dependencies based on the chosen framework and runner.
+ * 
+ * @param targetDir The directory where the new project is being scaffolded.
+ * @param type The testing type ('bdd' or 'non-bdd').
+ * @param runner The BDD runner ('playwright-bdd' or 'cucumber').
+ * @param projectName The custom project name to inject.
+ */
 async function updatePackageJson(targetDir: string, type: string, runner: string, projectName: string) {
   const pkgPath = path.join(targetDir, 'package.json');
   let pkg: any = {
@@ -47,10 +60,16 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   pkg.devDependencies['@playwright/test'] = '^1.44.1';
   pkg.devDependencies['typescript'] = '^5.4.5';
   pkg.devDependencies['@types/node'] = '^20.12.12';
-  pkg.devDependencies['allure-playwright'] = '^3.9.0';
   pkg.devDependencies['allure-commandline'] = '^2.29.0';
+  pkg.devDependencies['@hari/playwright-core'] = '^1.0.0';
+
+  if (type === 'bdd' && runner === 'cucumber') {
+    pkg.devDependencies['allure-cucumberjs'] = '^3.0.0-beta.5';
+  } else {
+    pkg.devDependencies['allure-playwright'] = '^3.9.0';
+  }
   
-  pkg.scripts['report'] = 'allure generate allure-results -o allure-report --clean && allure open allure-report';
+  pkg.scripts['report'] = 'hari-serve-report';
 
   if (type === 'bdd') {
     if (runner === 'playwright-bdd') {
@@ -71,6 +90,11 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   console.log(`📦 Updated package.json with necessary dependencies and scripts.`);
 }
 
+/**
+ * Main CLI execution function.
+ * Validates arguments, selects the correct template, copies files, and
+ * orchestrates the dynamic replacement of project names.
+ */
 async function init() {
   const { isInit, type, runner, projectName } = parseArgs();
 

@@ -3,18 +3,34 @@ import { devices } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import { getReportDirectory } from './reports';
 
+/**
+ * Interface defining the options that can be provided in `runconfig.json`
+ * to override default Playwright configurations.
+ */
 export interface RunConfig {
+  /** The target test environment (e.g., 'QA', 'DEV'). */
   testEnv?: string;
+  /** Global timeout for a single test execution in milliseconds. */
   timeout?: number;
+  /** Timeout for assertions (expect) in milliseconds. */
   expectTimeout?: number;
+  /** Timeout for individual Playwright actions (click, fill) in milliseconds. */
   actionTimeout?: number;
+  /** Timeout for page navigation actions in milliseconds. */
   navigationTimeout?: number;
+  /** Number of times to retry failed tests. */
   retries?: number;
+  /** Number of concurrent workers or percentage string (e.g., '50%'). */
   workers?: number | string;
+  /** Optional override for the reporter configuration. */
   reporter?: string;
+  /** Flag to forcefully route execution to BrowserStack. */
   useBrowserStack?: boolean;
+  /** Flag to run browsers in headless mode. */
   headless?: boolean;
+  /** Array of browser names to run the tests against (e.g., ['chromium', 'firefox']). */
   browsers?: string[];
 }
 
@@ -63,12 +79,35 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
       ? runConfig.workers 
       : Number(runConfig.workers);
   }
+  const runDir = getReportDirectory();
+
   if (runConfig.reporter !== undefined) {
     if (runConfig.reporter.toLowerCase() === 'allure') {
-      finalConfig.reporter = [['html'], ['allure-playwright']];
+      finalConfig.reporter = [
+        ['html', { outputFolder: `${runDir}/html-report` }], 
+        ['allure-playwright', { outputFolder: `${runDir}/allure-results` }]
+      ];
     } else {
       finalConfig.reporter = runConfig.reporter;
     }
+  } else if (Array.isArray(finalConfig.reporter)) {
+    // Override template reporters dynamically
+    finalConfig.reporter = finalConfig.reporter.map((r: any) => {
+      if (Array.isArray(r)) {
+        const [name, opts] = r;
+        if (name === 'html') return [name, { ...opts, outputFolder: `${runDir}/html-report` }];
+        if (name === 'allure-playwright') return [name, { ...opts, outputFolder: `${runDir}/allure-results` }];
+        return r;
+      } else {
+        if (r === 'html') return [r, { outputFolder: `${runDir}/html-report` }];
+        if (r === 'allure-playwright') return [r, { outputFolder: `${runDir}/allure-results` }];
+        return r;
+      }
+    });
+  } else if (!finalConfig.reporter) {
+    finalConfig.reporter = [
+      ['html', { outputFolder: `${runDir}/html-report` }]
+    ];
   }
 
   // Expect Configuration

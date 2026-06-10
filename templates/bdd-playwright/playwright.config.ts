@@ -13,6 +13,10 @@ const baseConfig = defineConfig({
   testDir,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  reporter: [
+    ['html'],
+    ['allure-playwright']
+  ],
   use: {
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',

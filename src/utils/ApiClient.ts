@@ -1,43 +1,92 @@
 import { APIRequestContext, APIResponse } from '@playwright/test';
 
+/**
+ * A wrapper around Playwright's `APIResponse` that provides convenient methods
+ * for accessing response data, status, and headers.
+ */
 export class ApiClientResponse {
+  /**
+   * Creates a new instance of `ApiClientResponse`.
+   * @param response - The raw Playwright `APIResponse` object.
+   */
   constructor(private readonly response: APIResponse) {}
 
-  status() {
+  /**
+   * Gets the HTTP status code of the response.
+   * @returns {number} The HTTP status code.
+   */
+  status(): number {
     return this.response.status();
   }
 
-  statusText() {
+  /**
+   * Gets the HTTP status text of the response.
+   * @returns {string} The HTTP status text.
+   */
+  statusText(): string {
     return this.response.statusText();
   }
 
-  async text() {
+  /**
+   * Gets the response body as a string.
+   * @returns {Promise<string>} A promise that resolves to the response body string.
+   */
+  async text(): Promise<string> {
     return this.response.text();
   }
 
+  /**
+   * Parses the response body as JSON.
+   * @template T The expected type of the JSON response.
+   * @returns {Promise<T>} A promise that resolves to the parsed JSON object.
+   */
   async json<T>(): Promise<T> {
     return (await this.response.json()) as T;
   }
 
-  headers() {
+  /**
+   * Gets the response headers.
+   * @returns {Record<string, string>} An object containing the response headers.
+   */
+  headers(): Record<string, string> {
     return this.response.headers();
   }
 
-  url() {
+  /**
+   * Gets the URL of the response.
+   * @returns {string} The response URL.
+   */
+  url(): string {
     return this.response.url();
   }
 
-  ok() {
+  /**
+   * Indicates whether the response was successful (status in the range 200-299).
+   * @returns {boolean} True if the response was successful, false otherwise.
+   */
+  ok(): boolean {
     return this.response.ok();
   }
 
-  // Access the raw Playwright APIResponse if needed
+  /**
+   * Access the raw Playwright `APIResponse` object if needed.
+   * @returns {APIResponse} The underlying Playwright APIResponse.
+   */
   raw(): APIResponse {
     return this.response;
   }
 }
 
+/**
+ * An enterprise-grade API client wrapper built on top of Playwright's `APIRequestContext`.
+ * Provides standardized logging, token injection, and automatic retries for robust API testing.
+ */
 export class ApiClient {
+  /**
+   * Creates a new instance of `ApiClient`.
+   * @param requestContext - The Playwright `APIRequestContext` used to make requests.
+   * @param baseURL - An optional base URL to prepend to all endpoint paths.
+   */
   constructor(
     private requestContext: APIRequestContext,
     private baseURL?: string
@@ -117,23 +166,53 @@ export class ApiClient {
     return new ApiClientResponse(response);
   }
 
-  async get(endpoint: string, options?: Parameters<APIRequestContext['get']>[1]) {
+  /**
+   * Sends an HTTP GET request.
+   * @param endpoint - The URL endpoint (appended to baseURL if configured).
+   * @param options - Additional Playwright request options (headers, params, etc.).
+   * @returns {Promise<ApiClientResponse>} A promise that resolves to the wrapped response.
+   */
+  async get(endpoint: string, options?: Parameters<APIRequestContext['get']>[1]): Promise<ApiClientResponse> {
     return this.request('get', endpoint, options);
   }
 
-  async post(endpoint: string, options?: Parameters<APIRequestContext['post']>[1]) {
+  /**
+   * Sends an HTTP POST request.
+   * @param endpoint - The URL endpoint (appended to baseURL if configured).
+   * @param options - Additional Playwright request options (data, headers, etc.).
+   * @returns {Promise<ApiClientResponse>} A promise that resolves to the wrapped response.
+   */
+  async post(endpoint: string, options?: Parameters<APIRequestContext['post']>[1]): Promise<ApiClientResponse> {
     return this.request('post', endpoint, options);
   }
 
-  async put(endpoint: string, options?: Parameters<APIRequestContext['put']>[1]) {
+  /**
+   * Sends an HTTP PUT request.
+   * @param endpoint - The URL endpoint (appended to baseURL if configured).
+   * @param options - Additional Playwright request options (data, headers, etc.).
+   * @returns {Promise<ApiClientResponse>} A promise that resolves to the wrapped response.
+   */
+  async put(endpoint: string, options?: Parameters<APIRequestContext['put']>[1]): Promise<ApiClientResponse> {
     return this.request('put', endpoint, options);
   }
 
-  async patch(endpoint: string, options?: Parameters<APIRequestContext['patch']>[1]) {
+  /**
+   * Sends an HTTP PATCH request.
+   * @param endpoint - The URL endpoint (appended to baseURL if configured).
+   * @param options - Additional Playwright request options (data, headers, etc.).
+   * @returns {Promise<ApiClientResponse>} A promise that resolves to the wrapped response.
+   */
+  async patch(endpoint: string, options?: Parameters<APIRequestContext['patch']>[1]): Promise<ApiClientResponse> {
     return this.request('patch', endpoint, options);
   }
 
-  async delete(endpoint: string, options?: Parameters<APIRequestContext['delete']>[1]) {
+  /**
+   * Sends an HTTP DELETE request.
+   * @param endpoint - The URL endpoint (appended to baseURL if configured).
+   * @param options - Additional Playwright request options (data, headers, etc.).
+   * @returns {Promise<ApiClientResponse>} A promise that resolves to the wrapped response.
+   */
+  async delete(endpoint: string, options?: Parameters<APIRequestContext['delete']>[1]): Promise<ApiClientResponse> {
     return this.request('delete', endpoint, options);
   }
 }
