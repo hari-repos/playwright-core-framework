@@ -22,14 +22,18 @@ function createMockRequestContext(mockResponse: any) {
 }
 
 test.describe('ApiClient Unit Tests', () => {
-  const originalEnv = process.env;
+  let originalToken: string | undefined;
 
   test.beforeEach(() => {
-    process.env = { ...originalEnv };
+    originalToken = process.env.BEARER_TOKEN;
   });
 
-  test.afterAll(() => {
-    process.env = originalEnv;
+  test.afterEach(() => {
+    if (originalToken === undefined) {
+      delete process.env.BEARER_TOKEN;
+    } else {
+      process.env.BEARER_TOKEN = originalToken;
+    }
   });
 
   test('should append baseURL correctly to relative endpoints', async () => {

@@ -1,14 +1,20 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('envConfig Unit Tests', () => {
-  const originalEnv = process.env;
+  let originalTestEnv: string | undefined;
+  let originalBaseUrl: string | undefined;
+  let originalApiUrl: string | undefined;
 
   test.beforeEach(() => {
-    process.env = { ...originalEnv };
+    originalTestEnv = process.env.TEST_ENV;
+    originalBaseUrl = process.env.BASE_URL;
+    originalApiUrl = process.env.API_URL;
   });
 
-  test.afterAll(() => {
-    process.env = originalEnv;
+  test.afterEach(() => {
+    if (originalTestEnv === undefined) delete process.env.TEST_ENV; else process.env.TEST_ENV = originalTestEnv;
+    if (originalBaseUrl === undefined) delete process.env.BASE_URL; else process.env.BASE_URL = originalBaseUrl;
+    if (originalApiUrl === undefined) delete process.env.API_URL; else process.env.API_URL = originalApiUrl;
   });
 
   test('should fallback to default QA environment if TEST_ENV is not set', async () => {

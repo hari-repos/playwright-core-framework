@@ -9,7 +9,8 @@ import { getTestData } from '../../src/utils/testData.js';
 import { envConfig } from '../../src/config/envConfig.js';
 
 test.describe('testData Unit Tests', () => {
-  const testDataDir = path.join(process.cwd(), 'test-data-scratch');
+const uniqueId = `${process.pid}-${Math.random().toString(36).substring(7)}`;
+  const testDataDir = path.join(process.cwd(), `test-data-scratch-${uniqueId}`);
   const envFile = path.join(testDataDir, `${envConfig.env.toLowerCase()}.json`);
 
   test.beforeAll(() => {
@@ -30,7 +31,7 @@ test.describe('testData Unit Tests', () => {
   test('should load data from current environment JSON file', () => {
     fs.writeFileSync(envFile, JSON.stringify({ key: 'value', num: 42 }));
 
-    const data = getTestData<{ key: string, num: number }>('test-data-scratch');
+    const data = getTestData<{ key: string, num: number }>(`test-data-scratch-${uniqueId}`);
     expect(data).toBeDefined();
     expect(data.key).toBe('value');
     expect(data.num).toBe(42);
@@ -41,6 +42,6 @@ test.describe('testData Unit Tests', () => {
       fs.unlinkSync(envFile);
     }
     
-    expect(() => getTestData('test-data-scratch')).toThrow(/Test data file not found/);
+    expect(() => getTestData(`test-data-scratch-${uniqueId}`)).toThrow(/Test data file not found/);
   });
 });

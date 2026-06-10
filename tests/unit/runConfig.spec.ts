@@ -4,7 +4,8 @@ import * as path from 'path';
 import { withRunConfig } from '../../src/config/runConfig';
 
 test.describe('runConfig Unit Tests', () => {
-  const testConfigDir = path.join(__dirname, 'temp-config');
+const uniqueId = `${process.pid}-${Math.random().toString(36).substring(7)}`;
+  const testConfigDir = path.join(__dirname, `temp-config-${uniqueId}`);
   const runConfigPath = path.join(testConfigDir, 'runconfig.json');
 
   test.beforeAll(() => {
