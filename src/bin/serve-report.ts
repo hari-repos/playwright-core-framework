@@ -20,7 +20,8 @@ const runs = fs.readdirSync(reportsDir)
   }))
   .sort((a, b) => b.time - a.time);
 
-if (runs.length === 0) {
+const latestRun = runs[0];
+if (!latestRun) {
   console.error(`❌ No run directories found in ${reportsDir}`);
   process.exit(1);
 }
@@ -40,8 +41,8 @@ if (targetRunName) {
     process.exit(1);
   }
 } else {
-  targetRun = runs[0].name;
-  targetRunDir = runs[0].path;
+  targetRun = latestRun.name;
+  targetRunDir = latestRun.path;
 }
 
 const allureResultsDir = path.join(targetRunDir, 'allure-results');

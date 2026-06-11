@@ -25,6 +25,9 @@ function parseArgs() {
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
+    if (arg === undefined) {
+      continue;
+    }
     if (arg === 'init') {
       isInit = true;
     } else {
@@ -135,11 +138,7 @@ async function init() {
     }
 
     console.log(`📂 Copying framework templates...`);
-    await fs.copy(templatesDir, targetDir, {
-      filter: (src) => {
-        return true;
-      }
-    });
+    await fs.copy(templatesDir, targetDir);
 
     const replaceProjectNameInFiles = async (dir: string) => {
       const files = await fs.readdir(dir);

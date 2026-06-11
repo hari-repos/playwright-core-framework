@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 /**
  * Retrieves the directory path for storing test reports for the current run.
  * If not already set in the environment variables (`TEST_RUN_DIR`), it generates
