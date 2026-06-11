@@ -37,7 +37,7 @@ export function withBrowserStack(baseConfig: PlaywrightTestConfig): PlaywrightTe
     ...baseConfig,
     projects: baseConfig.projects?.map(project => {
       // Do not execute API tests in BrowserStack
-      if (project.name?.toLowerCase().includes('api')) {
+      if (project.name?.toLowerCase()?.includes('api')) {
         return project;
       }
 

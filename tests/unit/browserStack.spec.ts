@@ -67,4 +67,20 @@ test.describe('browserStack Config Unit Tests', () => {
     const apiProject = config.projects?.find(p => p.name === 'API Tests');
     expect(apiProject?.use?.connectOptions).toBeUndefined();
   });
+
+  test('should not crash when project name is undefined', () => {
+    process.env.USE_BROWSERSTACK = 'true';
+    process.env.BROWSERSTACK_USERNAME = 'testuser';
+    process.env.BROWSERSTACK_ACCESS_KEY = 'testkey';
+
+    const baseConfigWithNoName: PlaywrightTestConfig = {
+      projects: [
+        { use: { browserName: 'chromium' } }
+      ]
+    };
+
+    const config = withBrowserStack(baseConfigWithNoName);
+    const project = config.projects?.[0];
+    expect(project?.use?.connectOptions?.wsEndpoint).toContain('wss://cdp.browserstack.com/playwright');
+  });
 });
