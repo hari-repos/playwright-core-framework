@@ -163,6 +163,27 @@ const baseConfig = defineConfig({
 export default withRunConfig(baseConfig);
 ```
 
+#### Configuring `runconfig.json`
+You can create a `runconfig.json` file in the root of your project to override Playwright defaults:
+
+```json
+{
+  "testEnv": "STAGING",
+  "headless": false,
+  "retries": 2,
+  "workers": "50%"
+}
+```
+
+> [!TIP]
+> **Dynamic Worker Scaling (`workers`)**:
+> Setting `"workers"` as a percentage string (e.g., `"50%"`) dynamically scales worker processes based on the logical CPU cores of the host running the tests:
+> - **CI/CD VM (2 cores)**: Automatically runs **1 worker** (50% of 2 cores).
+> - **Developer Laptop (8 cores)**: Automatically runs **4 workers** (50% of 8 cores).
+>
+> This prevents system overloading (CPU/memory thrashing) on smaller CI runners, while maximizing performance on high-spec developer machines.
+
+
 ### 4. Cloud Execution (`withBrowserStack`)
 Opt-in BrowserStack wrapper that injects capabilities effortlessly.
 

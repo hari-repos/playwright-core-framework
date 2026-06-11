@@ -31,7 +31,12 @@ export interface RunConfig {
   navigationTimeout?: number;
   /** Number of times to retry failed tests. */
   retries?: number;
-  /** Number of concurrent workers or percentage string (e.g., '50%'). */
+  /** 
+   * Number of concurrent workers or percentage string (e.g., '50%').
+   * Passing a percentage string allows Playwright to scale dynamically based on the logical CPU cores
+   * available on the host machine (e.g., '50%' uses 4 cores on an 8-core CPU, and 1 core on a 2-core CPU).
+   * This is particularly useful in CI/CD environments with varying VM configurations.
+   */
   workers?: number | string;
   /** Optional override for the reporter configuration. */
   reporter?: string;
