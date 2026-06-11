@@ -9,27 +9,37 @@ import * as path from 'path';
  */
 function parseArgs() {
   const args = process.argv.slice(2);
-  let type = 'bdd';
-  let runner = 'playwright-bdd';
   let isInit = false;
-  let projectName = 'playwright-tests';
+  
+  const config = {
+    type: 'bdd',
+    runner: 'playwright-bdd',
+    projectName: 'playwright-tests',
+  };
+
+  const argMap: Record<string, keyof typeof config> = {
+    '--type': 'type',
+    '--runner': 'runner',
+    '--name': 'projectName',
+  };
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === 'init') {
+    const arg = args[i];
+    if (arg === 'init') {
       isInit = true;
-    } else if (args[i] === '--type' && args[i + 1]) {
-      type = args[i + 1];
-      i++;
-    } else if (args[i] === '--runner' && args[i + 1]) {
-      runner = args[i + 1];
-      i++;
-    } else if (args[i] === '--name' && args[i + 1]) {
-      projectName = args[i + 1];
-      i++;
+    } else {
+      const key = argMap[arg];
+      if (key) {
+        const val = args[i + 1];
+        if (val) {
+          config[key] = val;
+          i++;
+        }
+      }
     }
   }
 
-  return { isInit, type, runner, projectName };
+  return { isInit, ...config };
 }
 
 /**
