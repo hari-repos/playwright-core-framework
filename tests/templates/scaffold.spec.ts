@@ -103,7 +103,20 @@ test.describe('Scaffolding Integration Tests', () => {
     } as NodeJS.ProcessEnv;
     execSync(`npm run test`, { cwd: projectDir, stdio: 'inherit', env });
     
-    // Assert successful generation by checking if reports exist or just relying on exit code 0
+    // Assert successful generation of common template files
+    expect(fs.existsSync(path.join(projectDir, '.gitignore'))).toBe(true);
+    expect(fs.existsSync(path.join(projectDir, '.npmrc'))).toBe(true);
+
+    if (type === 'bdd') {
+      const vscodeSettingsPath = path.join(projectDir, '.vscode', 'settings.json');
+      expect(fs.existsSync(vscodeSettingsPath)).toBe(true);
+      const settings = JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf-8'));
+      expect(settings['cucumber.features']).toBeDefined();
+      expect(settings['cucumber.glue']).toBeDefined();
+    } else {
+      expect(fs.existsSync(path.join(projectDir, '.vscode', 'settings.json'))).toBe(false);
+    }
+
     expect(true).toBe(true);
   }
 

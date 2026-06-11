@@ -1,0 +1,2 @@
+# Save exact dependency versions by default when running npm install
+save-exact=true

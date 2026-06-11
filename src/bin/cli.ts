@@ -144,6 +144,31 @@ async function init() {
     console.log(`📂 Copying framework templates...`);
     await fs.copy(templatesDir, targetDir);
 
+    // Copy common template configuration files
+    const commonDir = path.join(__dirname, '..', '..', 'templates', 'common');
+    if (fs.existsSync(commonDir)) {
+      console.log(`📂 Copying common template configuration files...`);
+      const gitignoreTemplate = path.join(commonDir, '.gitignore.template');
+      const targetGitignore = path.join(targetDir, '.gitignore');
+      if (fs.existsSync(gitignoreTemplate)) {
+        await fs.copy(gitignoreTemplate, targetGitignore);
+      }
+
+      const npmrcTemplate = path.join(commonDir, '.npmrc.template');
+      const targetNpmrc = path.join(targetDir, '.npmrc');
+      if (fs.existsSync(npmrcTemplate)) {
+        await fs.copy(npmrcTemplate, targetNpmrc);
+      }
+
+      if (type === 'bdd') {
+        const vscodeTemplate = path.join(commonDir, '.vscode', 'settings.json');
+        const targetVscode = path.join(targetDir, '.vscode', 'settings.json');
+        if (fs.existsSync(vscodeTemplate)) {
+          await fs.copy(vscodeTemplate, targetVscode);
+        }
+      }
+    }
+
     const replaceProjectNameInFiles = async (dir: string) => {
       const files = await fs.readdir(dir);
       for (const file of files) {
