@@ -160,7 +160,7 @@ const baseConfig = defineConfig({
 });
 
 // Auto-loads runconfig.json and .env
-export default withRunConfig(baseConfig, __dirname);
+export default withRunConfig(baseConfig);
 ```
 
 ### 4. Cloud Execution (`withBrowserStack`)
