@@ -10,7 +10,7 @@
     "hari-serve-report": "dist/bin/serve-report.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build",
     "test": "playwright test",
     "test:unit": "playwright test tests/unit",
