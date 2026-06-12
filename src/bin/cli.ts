@@ -101,7 +101,8 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
     } else if (runner === 'cucumber') {
       pkg.devDependencies['@cucumber/cucumber'] = '^10.8.0';
       pkg.devDependencies['tsx'] = '^4.11.0';
-      pkg.scripts['test'] = 'NODE_OPTIONS="--import tsx" cucumber-js';
+      pkg.devDependencies['cross-env'] = '^7.0.3';
+      pkg.scripts['test'] = 'cross-env NODE_OPTIONS="--import tsx" cucumber-js';
       // Cucumber uses a different allure reporter, but we provide it for playwright mostly
     }
   } else {
