@@ -1,25 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { ApiClient } from '../../src/utils/ApiClient';
-
-function createMockRequestContext(mockResponse: any) {
-  const mockMethod = async (url: string, options: any) => ({
-    status: () => mockResponse.status || 200,
-    statusText: () => mockResponse.statusText || 'OK',
-    text: async () => mockResponse.text || '',
-    json: async () => mockResponse.json || {},
-    headers: () => mockResponse.headers || {},
-    url: () => url,
-    ok: () => (mockResponse.status || 200) >= 200 && (mockResponse.status || 200) < 300,
-  });
-
-  return {
-    get: mockMethod,
-    post: mockMethod,
-    put: mockMethod,
-    patch: mockMethod,
-    delete: mockMethod,
-  } as any;
-}
+import { ApiClient } from '../../src/utils/ApiClient.js';
 
 test.describe('ApiClient Unit Tests', () => {
   let originalToken: string | undefined;
@@ -70,7 +50,7 @@ test.describe('ApiClient Unit Tests', () => {
     process.env.BEARER_TOKEN = 'test-token-123';
     let capturedHeaders: any = {};
     const mockContext = {
-      post: async (url: string, options: any) => {
+      post: async (_url: string, options: any) => {
         capturedHeaders = options?.headers || {};
         return { status: () => 201, statusText: () => 'Created', headers: () => ({}), text: async () => '' };
       }
@@ -86,7 +66,7 @@ test.describe('ApiClient Unit Tests', () => {
     process.env.BEARER_TOKEN = 'test-token-123';
     let capturedHeaders: any = {};
     const mockContext = {
-      get: async (url: string, options: any) => {
+      get: async (_url: string, options: any) => {
         capturedHeaders = options?.headers || {};
         return { status: () => 200, statusText: () => 'OK', headers: () => ({}), text: async () => '' };
       }
@@ -126,7 +106,7 @@ test.describe('ApiClient Unit Tests', () => {
     } as any;
 
     const client = new ApiClient(mockContext);
-    
+
     // Default retries is 3, so it should throw after 3 attempts
     await expect(client.get('https://api.example.com/fail')).rejects.toThrow(/after 3 attempts/);
   });
