@@ -55,11 +55,13 @@ if (!fs.existsSync(allureResultsDir)) {
 
 
 
+const escapePath = (p: string) => `"${p.replace(/\\/g, '/')}"`;
+
 if (isSingleFile) {
   console.log(`📊 Generating SINGLE-FILE Allure report for: ${targetRun}`);
   const singleFileReportDir = path.join(targetRunDir, 'allure-report-single');
   try {
-    execSync(`npx allure awesome ${allureResultsDir} -o ${singleFileReportDir} --single-file`, { stdio: 'inherit' });
+    execSync(`npx allure awesome ${escapePath(allureResultsDir)} -o ${escapePath(singleFileReportDir)} --single-file`, { stdio: 'inherit' });
     console.log(`✅ Single file report generated at ${singleFileReportDir}/index.html`);
   } catch (error) {
     console.error(`❌ Failed to generate single file Allure report`, error);
@@ -68,8 +70,8 @@ if (isSingleFile) {
 } else {
   console.log(`📊 Generating and serving Allure report for: ${targetRun}`);
   try {
-    execSync(`npx allure generate ${allureResultsDir} -o ${allureReportDir} --clean`, { stdio: 'inherit' });
-    execSync(`npx allure open ${allureReportDir}`, { stdio: 'inherit' });
+    execSync(`npx allure generate ${escapePath(allureResultsDir)} -o ${escapePath(allureReportDir)} --clean`, { stdio: 'inherit' });
+    execSync(`npx allure open ${escapePath(allureReportDir)}`, { stdio: 'inherit' });
   } catch (error) {
     console.error(`❌ Failed to serve Allure report`, error);
     process.exit(1);
