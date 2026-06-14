@@ -10,6 +10,7 @@
     "hari-serve-report": "dist/bin/serve-report.js"
   },
   "scripts": {
+    "prepare": "husky",
     "build": "tsc -p tsconfig.build.json",
     "prepublishOnly": "npm run build",
     "test": "playwright test",
@@ -27,10 +28,17 @@
   },
   "devDependencies": {
     "@allurereport/plugin-awesome": "^3.10.0",
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
     "@playwright/test": "^1.44.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/git": "^10.0.1",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.12.12",
     "allure": "^3.10.0",
+    "husky": "^9.1.7",
+    "semantic-release": "^25.0.5",
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
