@@ -125,7 +125,6 @@ import {
   expect,
   ApiClient, 
   envConfig,
-  withBrowserStack,
   withRunConfig
 } from '@hari/playwright-core';
 ```
@@ -184,13 +183,24 @@ You can create a `runconfig.json` file in the root of your project to override P
 > This prevents system overloading (CPU/memory thrashing) on smaller CI runners, while maximizing performance on high-spec developer machines.
 
 
-### 4. Cloud Execution (`withBrowserStack`)
-Opt-in BrowserStack wrapper that injects capabilities effortlessly.
+### 4. Cloud Execution (Unified CLI Runner)
+The framework natively orchestrates the official `browserstack-node-sdk` to guarantee flawless 1-to-1 cloud session mappings without changing your code or dealing with complex setup.
 
-```bash
-# Run tests on BrowserStack without changing code
-USE_BROWSERSTACK=true BROWSERSTACK_USERNAME=myUser BROWSERSTACK_ACCESS_KEY=key npm test
+By utilizing the smart `hari-test-runner` command in your package scripts, the core dynamically converts your `runconfig.json` into the required `browserstack.yml` configs and injects credentials from `.env` seamlessly.
+
+The runner natively supports standard **Playwright**, **Playwright BDD**, and **Cucumber** by simply passing the appropriate flags in your `package.json`:
+
+```json
+"scripts": {
+  "test": "hari-test-runner --runner playwright"
+}
 ```
+
+Simply run your tests as normal, and the runner manages everything (including BDD generation and cloud execution) automatically:
+```bash
+npm run test -- --headed
+```
+*If `useBrowserStack: false`, the exact same script executes natively locally, preserving 100% of Playwright's local speed and worker efficiency.*
 
 ---
 

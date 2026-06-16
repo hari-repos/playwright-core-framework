@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 import { testDir } from './bdd.config.js';
-import { withRunConfig, withBrowserStack, getReportDirectory } from '@hari/playwright-core';
+import { withRunConfig, getReportDirectory } from '@hari/playwright-core';
+import dotenv from 'dotenv';
 
 const reportDir = getReportDirectory();
 
@@ -24,5 +25,5 @@ const baseConfig = defineConfig({
 });
 
 // withRunConfig reads runconfig.json, loads the correct .env, and merges properties.
-// withBrowserStack applies cloud capabilities if useBrowserStack is true.
-export default withBrowserStack(withRunConfig(baseConfig));
+// Cloud execution is natively managed by hari-test-runner and the bstack-node-sdk.
+export default withRunConfig(baseConfig);

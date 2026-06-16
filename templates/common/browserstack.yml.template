@@ -1,0 +1,16 @@
+userName: ${BROWSERSTACK_USERNAME}
+accessKey: ${BROWSERSTACK_ACCESS_KEY}
+
+platforms:
+  - os: Windows
+    osVersion: 11
+    browserName: Chrome
+    browserVersion: latest
+
+# Advanced BrowserStack Configuration
+browserstackLocal: false
+buildName: Default Enterprise Build
+projectName: Enterprise Project
+# networkLogs: true
+# parallelsPerPlatform: 2
+# interactiveDebugging: true

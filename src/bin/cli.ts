@@ -96,17 +96,15 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
     if (runner === 'playwright-bdd') {
       pkg.devDependencies['playwright'] = '^1.44.1';
       pkg.devDependencies['playwright-bdd'] = '^9.0.0';
-      pkg.scripts['bddgen'] = 'bddgen';
-      pkg.scripts['test'] = 'npm run bddgen && playwright test';
+      pkg.scripts['test'] = 'hari-test-runner --type bdd --runner playwright-bdd';
     } else if (runner === 'cucumber') {
       pkg.devDependencies['@cucumber/cucumber'] = '^10.8.0';
       pkg.devDependencies['tsx'] = '^4.11.0';
-      pkg.devDependencies['cross-env'] = '^7.0.3';
-      pkg.scripts['test'] = 'cross-env NODE_OPTIONS="--import tsx" cucumber-js';
+      pkg.scripts['test'] = 'hari-test-runner --type bdd --runner cucumber';
       // Cucumber uses a different allure reporter, but we provide it for playwright mostly
     }
   } else {
-    pkg.scripts['test'] = 'playwright test';
+    pkg.scripts['test'] = 'hari-test-runner --runner playwright';
   }
 
   await fs.writeJson(pkgPath, pkg, { spaces: 2 });
@@ -159,6 +157,12 @@ async function init() {
       const targetNpmrc = path.join(targetDir, '.npmrc');
       if (fs.existsSync(npmrcTemplate)) {
         await fs.copy(npmrcTemplate, targetNpmrc);
+      }
+
+      const bstackTemplate = path.join(commonDir, 'browserstack.yml.template');
+      const targetBstack = path.join(targetDir, 'browserstack.yml');
+      if (fs.existsSync(bstackTemplate)) {
+        await fs.copy(bstackTemplate, targetBstack);
       }
 
       if (type === 'bdd') {

@@ -7,7 +7,8 @@
   "types": "dist/index.d.ts",
   "bin": {
     "hari-playwright-init": "dist/bin/cli.js",
-    "hari-serve-report": "dist/bin/serve-report.js"
+    "hari-serve-report": "dist/bin/serve-report.js",
+    "hari-test-runner": "dist/bin/test-runner.js"
   },
   "scripts": {
     "prepare": "husky",
@@ -23,8 +24,10 @@
   ],
   "dependencies": {
     "allure-playwright": "^3.10.0",
+    "browserstack-node-sdk": "^1.31.0",
     "dotenv": "^16.4.5",
-    "fs-extra": "^11.2.0"
+    "fs-extra": "^11.2.0",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@allurereport/plugin-awesome": "^3.10.0",
@@ -36,6 +39,7 @@
     "@semantic-release/git": "^10.0.1",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.12.12",
+    "@types/yaml": "^1.9.6",
     "allure": "^3.10.0",
     "husky": "^9.1.7",
     "semantic-release": "^25.0.5",

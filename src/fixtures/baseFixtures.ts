@@ -89,31 +89,6 @@ export const coreFixtures: CoreFixturesType = {
  * });
  * ```
  */
-export const test = baseTest.extend<CustomFixtures>({
-  ...coreFixtures,
-  page: async ({ page }, use, testInfo) => {
-    // Yield the page to the test
-    await use(page);
-
-    // After the test ends, report the status to BrowserStack if enabled
-    if (process.env.USE_BROWSERSTACK === 'true') {
-      const status = testInfo.status === 'passed' ? 'passed' : 'failed';
-      // Sanitize the error message to avoid breaking JSON serialization
-      const reason = testInfo.error?.message?.replace(/\n/g, ' ') || (status === 'passed' ? 'Test completed successfully' : 'Test failed');
-      
-      try {
-        await page.evaluate((_: string) => {}, `browserstack_executor: ${JSON.stringify({ action: 'setSessionName', arguments: { name: testInfo.title } })}`);
-        await page.evaluate((_: string) => {}, `browserstack_executor: ${JSON.stringify({ action: 'setSessionStatus', arguments: { status, reason } })}`);
-        
-        // Use getSessionDetails as a deterministic barrier instead of a hard wait.
-        // Awaiting this forces a round-trip to the BrowserStack proxy, guaranteeing 
-        // that the previous status update commands were fully processed.
-        await page.evaluate((_: string) => {}, `browserstack_executor: {"action": "getSessionDetails"}`);
-      } catch (e) {
-        // Evaluation might fail if the page is already closed, which is fine to ignore on teardown
-      }
-    }
-  }
-});
+export const test = baseTest.extend<CustomFixtures>(coreFixtures);
 
 export { expect } from '@playwright/test';
