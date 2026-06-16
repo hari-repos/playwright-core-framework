@@ -46,6 +46,8 @@ export interface RunConfig {
   headless?: boolean;
   /** Array of browser names to run the tests against (e.g., ['chromium', 'firefox']). */
   browsers?: string[];
+  /** Flag to start the browser maximized. Overrides viewport to null. */
+  maximized?: boolean;
 }
 
 /**
@@ -130,6 +132,18 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
   if (runConfig.navigationTimeout !== undefined) finalConfig.use.navigationTimeout = runConfig.navigationTimeout;
   if (runConfig.headless !== undefined) finalConfig.use.headless = runConfig.headless;
 
+  // Maximize Window Configuration
+  if (runConfig.maximized) {
+    // Playwright requires viewport to be null to allow native OS maximization
+    finalConfig.use.viewport = null;
+    
+    // Pass the start-maximized arg to the browser launch options
+    finalConfig.use.launchOptions = {
+      ...finalConfig.use.launchOptions,
+      args: [...(finalConfig.use.launchOptions?.args || []), '--start-maximized']
+    };
+  }
+
   // 3. Browser Selection Override
   if (runConfig.browsers && Array.isArray(runConfig.browsers) && runConfig.browsers.length > 0) {
     finalConfig.projects = runConfig.browsers.map(browser => {
@@ -150,6 +164,7 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
         use: {
           ...device,
           browserName: browser.toLowerCase() as 'chromium' | 'firefox' | 'webkit',
+          ...(runConfig.maximized ? { viewport: null } : {})
         }
       };
     });
