@@ -101,11 +101,14 @@ export const test = baseTest.extend<CustomFixtures>({
       // Sanitize the error message to avoid breaking JSON serialization
       const reason = testInfo.error?.message?.replace(/\n/g, ' ') || (status === 'passed' ? 'Test completed successfully' : 'Test failed');
       
-      const executorObj = { action: 'setSessionStatus', arguments: { status, reason } };
-      const executorStr = `browserstack_executor: ${JSON.stringify(executorObj)}`;
-      
       try {
-        await page.evaluate(() => {}, executorStr);
+        await page.evaluate((_: string) => {}, `browserstack_executor: ${JSON.stringify({ action: 'setSessionName', arguments: { name: testInfo.title } })}`);
+        await page.evaluate((_: string) => {}, `browserstack_executor: ${JSON.stringify({ action: 'setSessionStatus', arguments: { status, reason } })}`);
+        
+        // Use getSessionDetails as a deterministic barrier instead of a hard wait.
+        // Awaiting this forces a round-trip to the BrowserStack proxy, guaranteeing 
+        // that the previous status update commands were fully processed.
+        await page.evaluate((_: string) => {}, `browserstack_executor: {"action": "getSessionDetails"}`);
       } catch (e) {
         // Evaluation might fail if the page is already closed, which is fine to ignore on teardown
       }
