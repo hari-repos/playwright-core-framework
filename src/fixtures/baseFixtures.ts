@@ -89,6 +89,28 @@ export const coreFixtures: CoreFixturesType = {
  * });
  * ```
  */
-export const test = baseTest.extend<CustomFixtures>(coreFixtures);
+export const test = baseTest.extend<CustomFixtures>({
+  ...coreFixtures,
+  page: async ({ page }, use, testInfo) => {
+    // Yield the page to the test
+    await use(page);
+
+    // After the test ends, report the status to BrowserStack if enabled
+    if (process.env.USE_BROWSERSTACK === 'true') {
+      const status = testInfo.status === 'passed' ? 'passed' : 'failed';
+      // Sanitize the error message to avoid breaking JSON serialization
+      const reason = testInfo.error?.message?.replace(/\n/g, ' ') || (status === 'passed' ? 'Test completed successfully' : 'Test failed');
+      
+      const executorObj = { action: 'setSessionStatus', arguments: { status, reason } };
+      const executorStr = `browserstack_executor: ${JSON.stringify(executorObj)}`;
+      
+      try {
+        await page.evaluate(() => {}, executorStr);
+      } catch (e) {
+        // Evaluation might fail if the page is already closed, which is fine to ignore on teardown
+      }
+    }
+  }
+});
 
 export { expect } from '@playwright/test';

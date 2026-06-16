@@ -33,16 +33,29 @@ export function withBrowserStack(baseConfig: PlaywrightTestConfig): PlaywrightTe
   // Standardize the build name across all company projects
   const buildName = process.env.BROWSERSTACK_BUILD_NAME || 'Default Enterprise Build';
 
+  let projects = baseConfig.projects;
+  if (!projects || projects.length === 0) {
+    projects = [{
+      name: 'default',
+      use: { browserName: baseConfig.use?.browserName || 'chromium' }
+    }];
+  }
+
   return {
     ...baseConfig,
-    projects: baseConfig.projects?.map(project => {
+    projects: projects.map(project => {
       // Do not execute API tests in BrowserStack
       if (project.name?.toLowerCase()?.includes('api')) {
         return project;
       }
 
+      let browserCap: string = project.use?.browserName || baseConfig.use?.browserName || 'chromium';
+      if (browserCap === 'chromium') browserCap = 'playwright-chromium';
+      else if (browserCap === 'firefox') browserCap = 'playwright-firefox';
+      else if (browserCap === 'webkit') browserCap = 'playwright-webkit';
+
       const caps = {
-        'browser': project.use?.browserName || 'chromium',
+        'browser': browserCap,
         'browser_version': 'latest',
         'os': 'Windows',
         'os_version': '11',
