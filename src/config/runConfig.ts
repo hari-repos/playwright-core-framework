@@ -95,6 +95,8 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
     process.env.USE_BROWSERSTACK = 'true';
   }
 
+  const isBrowserStack = process.env.USE_BROWSERSTACK === 'true';
+
   // 2. Build Modified Configuration
   const finalConfig: PlaywrightTestConfig = { ...baseConfig };
 
@@ -134,9 +136,6 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
 
   // Maximize Window Configuration
   if (runConfig.maximized) {
-    // Playwright requires viewport to be null to allow native OS maximization
-    finalConfig.use.viewport = null;
-    
     // Pass the start-maximized arg to the browser launch options
     finalConfig.use.launchOptions = {
       ...finalConfig.use.launchOptions,
@@ -159,13 +158,19 @@ export function withRunConfig(baseConfig: PlaywrightTestConfig, configDir: strin
         device = devices['Desktop Edge'];
       }
 
+      const shouldMaximizeLocally = runConfig.maximized && !isBrowserStack;
+
       return {
         name: browser.toLowerCase(),
-        use: {
-          ...device,
-          browserName: browser.toLowerCase() as 'chromium' | 'firefox' | 'webkit',
-          ...(runConfig.maximized ? { viewport: null } : {})
-        }
+        use: shouldMaximizeLocally
+          ? {
+              browserName: browser.toLowerCase() as 'chromium' | 'firefox' | 'webkit',
+              viewport: null
+            }
+          : {
+              ...device,
+              browserName: browser.toLowerCase() as 'chromium' | 'firefox' | 'webkit'
+            }
       };
     });
   }

@@ -59,16 +59,16 @@ if (isBdd && runnerType === 'playwright-bdd') {
 
 // 3. Resolve the underlying command and SDK wrapper prefix
 let sdkCommand = 'playwright';
-let commandToRun = 'npx playwright test';
+let commandToRun = 'test';
 
 if (runnerType === 'cucumber') {
   sdkCommand = 'cucumber-js';
-  commandToRun = 'npx cucumber-js';
+  commandToRun = '';
   // Inject tsx import directly into the environment, removing the need for cross-env
   process.env.NODE_OPTIONS = (process.env.NODE_OPTIONS || '') + ' --import tsx';
 } else if (runnerType === 'playwright-bdd' || runnerType === 'playwright') {
   sdkCommand = 'playwright';
-  commandToRun = 'npx playwright test';
+  commandToRun = 'test';
 }
 
 import * as yaml from 'yaml';
@@ -140,7 +140,7 @@ if (runConfig.useBrowserStack || process.env.USE_BROWSERSTACK === 'true') {
   fs.writeFileSync(yamlPath, updatedYaml, 'utf-8');
 
   // Spawn SDK
-  console.log(`🚀 Spawning BrowserStack SDK for command: ${commandToRun}${extraFlags}`);
+  console.log(`🚀 Spawning BrowserStack SDK for command: ${sdkCommand} ${commandToRun}${extraFlags}`);
   try {
     execSync(`npx browserstack-node-sdk ${sdkCommand} ${commandToRun}${extraFlags}`, { stdio: 'inherit', env: process.env });
   } catch (error: any) {
@@ -148,9 +148,9 @@ if (runConfig.useBrowserStack || process.env.USE_BROWSERSTACK === 'true') {
     process.exit(error.status || 1);
   }
 } else {
-  console.log(`💻 Local execution requested. Running: ${commandToRun}${extraFlags}`);
+  console.log(`💻 Local execution requested. Running: npx ${sdkCommand} ${commandToRun}${extraFlags}`);
   try {
-    execSync(`${commandToRun}${extraFlags}`, { stdio: 'inherit', env: process.env });
+    execSync(`npx ${sdkCommand} ${commandToRun}${extraFlags}`, { stdio: 'inherit', env: process.env });
   } catch (error: any) {
     console.error(`❌ Test execution failed with code ${error.status}`);
     process.exit(error.status || 1);

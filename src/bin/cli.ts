@@ -82,6 +82,7 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   pkg.devDependencies['@types/node'] = '^20.12.12';
   pkg.devDependencies['allure'] = '^3.10.0';
   pkg.devDependencies['@allurereport/plugin-awesome'] = '^3.10.0';
+  pkg.devDependencies['browserstack-node-sdk'] = '^1.31.0';
   pkg.devDependencies['@hari/playwright-core'] = '^1.0.0';
 
   if (type === 'bdd' && runner === 'cucumber') {
