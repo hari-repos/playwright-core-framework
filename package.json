@@ -24,7 +24,7 @@
   ],
   "dependencies": {
     "allure-playwright": "^3.10.0",
-    "browserstack-node-sdk": "^1.31.0",
+    "browserstack-node-sdk": "1.52.0",
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
     "yaml": "^2.9.0"
