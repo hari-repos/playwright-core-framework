@@ -107,7 +107,8 @@ test.describe('Scaffolding Integration Tests', () => {
     expect(fs.existsSync(path.join(projectDir, '.gitignore'))).toBe(true);
     expect(fs.existsSync(path.join(projectDir, '.npmrc'))).toBe(true);
 
-    if (type === 'bdd') {
+    const isBddType = type === 'bdd' || type === 'api-bdd';
+    if (isBddType) {
       const vscodeSettingsPath = path.join(projectDir, '.vscode', 'settings.json');
       expect(fs.existsSync(vscodeSettingsPath)).toBe(true);
       const settings = JSON.parse(fs.readFileSync(vscodeSettingsPath, 'utf-8'));
@@ -130,5 +131,17 @@ test.describe('Scaffolding Integration Tests', () => {
 
   test('should scaffold and run bdd-cucumber project successfully', async () => {
     await runScaffoldTest('test-bdd-cuke', 'bdd', 'cucumber');
+  });
+
+  test('should scaffold and run api-non-bdd project successfully', async () => {
+    await runScaffoldTest('test-api-non-bdd', 'api-non-bdd');
+  });
+
+  test('should scaffold and run api-bdd-playwright project successfully', async () => {
+    await runScaffoldTest('test-api-bdd-pw', 'api-bdd', 'playwright-bdd');
+  });
+
+  test('should scaffold and run api-bdd-cucumber project successfully', async () => {
+    await runScaffoldTest('test-api-bdd-cuke', 'api-bdd', 'cucumber');
   });
 });

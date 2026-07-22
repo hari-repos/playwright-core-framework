@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getReportDirectory } from '../../src/config/reports';
+import { getReportDirectory } from '../../src/config/reports.js';
 
 test.describe('reports Config Unit Tests', () => {
   let originalDir: string | undefined;

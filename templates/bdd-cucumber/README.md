@@ -2,12 +2,17 @@
 
 This project was generated using `@hari/playwright-core` with native `@cucumber/cucumber` support.
 
+## Features & Capabilities
+
+- **BDD UI Testing**: Traditional Cucumber.js integration for writing tests using Gherkin syntax.
+- **BDD API Testing**: Fully supports fluent request building (`RequestBuilder`), JSON schema validation (`JsonValidator`), syntactic XML validation/parsing (`XmlValidator`), and OAuth credentials token lifecycle management (`TokenService`) inside your step definitions.
+
 ## Getting Started
 
 1. Run `npm install` to install dependencies.
 2. Copy `.env.example` to `.env`.
-3. Write your BDD tests inside `features/` using Gherkin syntax.
-4. Implement step definitions in `features/steps/`.
+3. Write your BDD tests inside `features/` using Gherkin syntax (see `features/api.feature` for reference).
+4. Implement step definitions in `steps/` (see `steps/api.steps.ts` for reference).
 
 ## Running Tests
 

@@ -1,4 +1,6 @@
 import { test, APIRequestContext, APIResponse } from '@playwright/test';
+import { TokenService, TokenConfig } from './TokenService.js';
+import { RequestBuilder } from './RequestBuilder.js';
 
 /**
  * A wrapper around Playwright's `APIResponse` that provides convenient methods
@@ -104,7 +106,8 @@ export class ApiClient {
    */
   constructor(
     private requestContext: APIRequestContext,
-    private baseURL?: string
+    private baseURL?: string,
+    private tokenConfig?: TokenConfig
   ) {}
 
   private async request(
@@ -117,7 +120,12 @@ export class ApiClient {
     const url = (this.baseURL && !isAbsoluteUrl)
       ? `${this.baseURL.replace(/\/$/, '')}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`
       : endpoint;
-    const token = !isAbsoluteUrl ? process.env.BEARER_TOKEN : undefined;
+    let token = !isAbsoluteUrl ? process.env.BEARER_TOKEN : undefined;
+    
+    // Automatically fetch and inject token if tokenConfig is provided
+    if (this.tokenConfig && !isAbsoluteUrl) {
+      token = await TokenService.getToken(this.requestContext, this.tokenConfig);
+    }
 
     const reqOptions = {
       ...options,
@@ -231,6 +239,26 @@ export class ApiClient {
    */
   async get(endpoint: string, options?: Parameters<APIRequestContext['get']>[1]): Promise<ApiClientResponse> {
     return this.request('get', endpoint, options);
+  }
+
+  /**
+   * Executes a request configured via the RequestBuilder.
+   * 
+   * @param builder - The RequestBuilder instance containing the request configuration.
+   * @returns {Promise<ApiClientResponse>}
+   * 
+   * @example
+   * ```typescript
+   * const builder = new RequestBuilder('/users').withMethod('POST').withBody({ name: 'Alice' });
+   * const res = await apiClient.execute(builder);
+   * ```
+   */
+  async execute(builder: RequestBuilder): Promise<ApiClientResponse> {
+    return this.request(
+      builder.getMethod(),
+      builder.buildEndpoint(),
+      builder.buildOptions()
+    );
   }
 
   /**

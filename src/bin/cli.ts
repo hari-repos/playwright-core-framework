@@ -85,7 +85,9 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   pkg.devDependencies['browserstack-node-sdk'] = '^1.31.0';
   pkg.devDependencies['@hari/playwright-core'] = '^1.0.0';
 
-  if (type === 'bdd' && runner === 'cucumber') {
+  const isBdd = type === 'bdd' || type === 'api-bdd';
+
+  if (isBdd && runner === 'cucumber') {
     pkg.devDependencies['allure-cucumberjs'] = '^3.0.0-beta.5';
   } else {
     pkg.devDependencies['allure-playwright'] = '^3.10.0';
@@ -93,7 +95,7 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
   pkg.scripts['report:open'] = 'hari-serve-report';
   pkg.scripts['report:download'] = 'hari-serve-report --single-file';
 
-  if (type === 'bdd') {
+  if (isBdd) {
     if (runner === 'playwright-bdd') {
       pkg.devDependencies['playwright'] = '^1.44.1';
       pkg.devDependencies['playwright-bdd'] = '^9.0.0';
@@ -102,7 +104,6 @@ async function updatePackageJson(targetDir: string, type: string, runner: string
       pkg.devDependencies['@cucumber/cucumber'] = '^10.8.0';
       pkg.devDependencies['tsx'] = '^4.11.0';
       pkg.scripts['test'] = 'hari-test-runner --type bdd --runner cucumber';
-      // Cucumber uses a different allure reporter, but we provide it for playwright mostly
     }
   } else {
     pkg.scripts['test'] = 'hari-test-runner --runner playwright';
@@ -121,13 +122,17 @@ async function init() {
   const { isInit, type, runner, projectName } = parseArgs();
 
   if (!isInit) {
-    console.log(`Usage: npx @hari/playwright-core init [--name <projectName>] [--type bdd|non-bdd] [--runner playwright-bdd|cucumber]`);
+    console.log(`Usage: npx @hari/playwright-core init [--name <projectName>] [--type bdd|non-bdd|api-bdd|api-non-bdd] [--runner playwright-bdd|cucumber]`);
     process.exit(1);
   }
 
   let templateSubDir = 'non-bdd';
   if (type === 'bdd') {
     templateSubDir = runner === 'cucumber' ? 'bdd-cucumber' : 'bdd-playwright';
+  } else if (type === 'api-bdd') {
+    templateSubDir = runner === 'cucumber' ? 'api-bdd-cucumber' : 'api-bdd-playwright';
+  } else if (type === 'api-non-bdd') {
+    templateSubDir = 'api-non-bdd';
   }
 
   const targetDir = process.cwd();
@@ -166,7 +171,7 @@ async function init() {
         await fs.copy(bstackTemplate, targetBstack);
       }
 
-      if (type === 'bdd') {
+      if (type === 'bdd' || type === 'api-bdd') {
         const vscodeTemplate = path.join(commonDir, '.vscode', 'settings.json');
         const targetVscode = path.join(targetDir, '.vscode', 'settings.json');
         if (fs.existsSync(vscodeTemplate)) {

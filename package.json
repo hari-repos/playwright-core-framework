@@ -23,10 +23,14 @@
     "templates"
   ],
   "dependencies": {
+    "ajv": "^8.20.0",
     "allure-playwright": "^3.10.0",
     "browserstack-node-sdk": "1.52.0",
     "dotenv": "^16.4.5",
+    "fast-xml-parser": "^5.10.1",
+    "fast-xml-validator": "^1.4.0",
     "fs-extra": "^11.2.0",
+    "jsonwebtoken": "^9.0.3",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
@@ -38,6 +42,7 @@
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
     "@types/fs-extra": "^11.0.4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.12.12",
     "@types/yaml": "^1.9.6",
     "allure": "^3.10.0",

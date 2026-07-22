@@ -23,7 +23,7 @@ test.describe('envConfig Unit Tests', () => {
     process.env.API_URL = 'https://api.default.com';
 
     // Dynamic import to re-evaluate module after changing process.env
-    const { envConfig } = await import('../../src/config/envConfig');
+    const { envConfig } = await import('../../src/config/envConfig.js');
     
     // In playwright test, module caching prevents re-evaluation. 
     // Since envConfig executes immediately on import, we just test the default values here

@@ -1,0 +1,8 @@
+{
+  "testEnv": "qa",
+  "timeout": 30000,
+  "expectTimeout": 5000,
+  "retries": 0,
+  "workers": 2,
+  "useBrowserStack": false
+}

@@ -86,24 +86,40 @@ npx @hari/playwright-core init --name <your-project-name>
 
 ### Step 2: Choose Your Template
 
-Our CLI supports dynamic template injection based on your preferred testing paradigm. 
+Our CLI supports dynamic template injection based on your preferred testing paradigm and project scope:
 
 #### Option A: Native Playwright (Non-BDD)
-Standard Playwright spec files (`.spec.ts`).
+Full UI & API capabilities using standard Playwright spec files (`.spec.ts`).
 ```bash
 npx @hari/playwright-core init --name ui-regression --type non-bdd
 ```
 
 #### Option B: Playwright BDD (Recommended for BDD)
-Uses `playwright-bdd` which natively compiles Gherkin to Playwright specs.
+Full UI & API BDD testing using `playwright-bdd` (which compiles Gherkin to Playwright specs).
 ```bash
 npx @hari/playwright-core init --name bdd-e2e --type bdd --runner playwright-bdd
 ```
 
 #### Option C: Cucumber BDD
-Uses traditional `@cucumber/cucumber` integration.
+Full UI & API BDD testing using traditional `@cucumber/cucumber` integration.
 ```bash
 npx @hari/playwright-core init --name cucumber-e2e --type bdd --runner cucumber
+```
+
+#### Option D: API-Only Playwright (Non-BDD)
+Lightweight API testing without UI components/overhead using standard spec files.
+```bash
+npx @hari/playwright-core init --name api-tests --type api-non-bdd
+```
+
+#### Option E: API-Only BDD
+API-only BDD testing using either `playwright-bdd` or `@cucumber/cucumber`.
+```bash
+# Playwright-BDD runner (Default)
+npx @hari/playwright-core init --name api-bdd-pw --type api-bdd --runner playwright-bdd
+
+# Cucumber runner
+npx @hari/playwright-core init --name api-bdd-cuc --type api-bdd --runner cucumber
 ```
 
 ### Step 3: Install & Run
@@ -125,7 +141,11 @@ import {
   expect,
   ApiClient, 
   envConfig,
-  withRunConfig
+  withRunConfig,
+  RequestBuilder,
+  JsonValidator,
+  XmlValidator,
+  TokenService
 } from '@hari/playwright-core';
 ```
 
@@ -162,6 +182,94 @@ const baseConfig = defineConfig({
 export default withRunConfig(baseConfig);
 ```
 
+### 4. Fluent Request Builder (`RequestBuilder`)
+Constructs HTTP requests using a type-safe, fluent interface for parameters, headers, body, and path variables.
+
+```typescript
+import { test, RequestBuilder } from '@hari/playwright-core';
+
+test('create user via RequestBuilder', async ({ apiClient }) => {
+  const request = new RequestBuilder('/users/:userId/posts')
+    .withMethod('POST')
+    .withPathVariable('userId', 123)
+    .withQueryParam('active', true)
+    .withHeaders({ 'Content-Type': 'application/json' })
+    .withBody({ title: 'New Post', body: 'Post content' });
+
+  // Execute request using the ApiClient
+  const response = await apiClient.execute(request);
+  expect(response.status()).toBe(201);
+});
+```
+
+### 5. JSON Schema Validation (`JsonValidator`)
+Validates API JSON response payloads against JSON schemas utilizing `ajv` under the hood.
+
+```typescript
+import { test, expect, JsonValidator } from '@hari/playwright-core';
+
+test('validate schema', async ({ apiClient }) => {
+  const response = await apiClient.get('/users/1');
+  const body = await response.json();
+
+  const userSchema = {
+    type: 'object',
+    properties: {
+      id: { type: 'integer' },
+      name: { type: 'string' }
+    },
+    required: ['id', 'name']
+  };
+
+  const validator = new JsonValidator();
+  expect(() => validator.validate(userSchema, body)).not.toThrow();
+});
+```
+
+### 6. XML Validation & Parsing (`XmlValidator`)
+Performs syntax validation and parses XML documents into standard JavaScript objects (using `fast-xml-validator` and `fast-xml-parser`).
+
+```typescript
+import { test, expect, XmlValidator } from '@hari/playwright-core';
+
+test('validate and parse XML', async () => {
+  const xmlData = `
+    <book>
+      <title>Playwright Core</title>
+      <author>Hari</author>
+    </book>
+  `;
+
+  const validator = new XmlValidator();
+  
+  // Syntax validation (throws on invalid syntax)
+  expect(validator.isValid(xmlData)).toBe(true);
+  
+  // Parse to JS Object
+  const obj = validator.parse(xmlData);
+  expect(obj.book.title).toBe('Playwright Core');
+});
+```
+
+### 7. Automatic OAuth Token Service (`TokenService`)
+Generates, caches, and automatically injects OAuth Bearer tokens for authenticated endpoints.
+
+Configure your `ApiClient` with a `TokenConfig` in the constructor or setup scripts:
+
+```typescript
+import { ApiClient, TokenConfig } from '@hari/playwright-core';
+
+const tokenConfig: TokenConfig = {
+  authUrl: 'https://auth.company.com/oauth/v2/token',
+  clientId: 'client-id-here',
+  clientSecret: 'client-secret-here',
+  scope: 'api:read'
+};
+
+// Pass tokenConfig as the 3rd parameter.
+// The ApiClient will automatically fetch, cache, and inject the token.
+const secureClient = new ApiClient(requestContext, 'https://api.company.com', tokenConfig);
+```
 #### Configuring `runconfig.json`
 You can create a `runconfig.json` file in the root of your project to override Playwright defaults:
 

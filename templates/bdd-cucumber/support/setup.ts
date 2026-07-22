@@ -11,6 +11,7 @@ export class CustomWorld extends World {
   apiContext?: APIRequestContext;
   apiClient?: ApiClient;
   apiResponse?: any;
+  parsedXml?: any;
 
   constructor(options: any) {
     super(options);
